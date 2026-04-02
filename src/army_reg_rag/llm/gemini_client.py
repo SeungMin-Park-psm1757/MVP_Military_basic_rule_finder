@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import re
 from dataclasses import dataclass, field
 from typing import Any
@@ -9,6 +8,7 @@ from army_reg_rag.config import Settings
 from army_reg_rag.domain.models import SearchHit
 from army_reg_rag.llm.prompts import SYSTEM_PROMPT, build_user_prompt
 from army_reg_rag.llm.usage_tracker import GeminiUsageTracker
+from army_reg_rag.utils.runtime_config import get_runtime_value
 
 try:
     from google import genai
@@ -59,7 +59,7 @@ class GeneratedAnswer:
 class GeminiAnswerClient:
     def __init__(self, settings: Settings):
         self.settings = settings
-        self.api_key = os.getenv("GEMINI_API_KEY", "").strip()
+        self.api_key = str(get_runtime_value("GEMINI_API_KEY", "")).strip()
         self._client = None
         self.usage_tracker = GeminiUsageTracker(settings)
         if self.api_key and genai is not None:

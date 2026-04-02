@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import os
 import yaml
 from pydantic import BaseModel, Field
+
+from army_reg_rag.utils.runtime_config import get_runtime_bool, get_runtime_value
 
 
 class AppConfig(BaseModel):
@@ -111,20 +112,48 @@ def load_settings(config_path: str | Path | None = None) -> Settings:
         raw = yaml.safe_load(f) or {}
 
     env_override = {}
-    if os.getenv("APP_DAILY_LIMIT"):
-        env_override.setdefault("app", {})["daily_limit"] = int(os.getenv("APP_DAILY_LIMIT", "20"))
-    if os.getenv("APP_MAX_QUESTION_CHARS"):
-        env_override.setdefault("app", {})["max_question_chars"] = int(os.getenv("APP_MAX_QUESTION_CHARS", "600"))
-    if os.getenv("GEMINI_MODEL_NAME"):
-        env_override.setdefault("llm", {})["model_name"] = os.getenv("GEMINI_MODEL_NAME")
-    if os.getenv("GEMINI_DAILY_REQUEST_BUDGET"):
-        env_override.setdefault("llm", {})["daily_request_budget"] = int(os.getenv("GEMINI_DAILY_REQUEST_BUDGET", "20"))
-    if os.getenv("GEMINI_DAILY_TOKEN_BUDGET"):
-        env_override.setdefault("llm", {})["daily_token_budget"] = int(os.getenv("GEMINI_DAILY_TOKEN_BUDGET", "120000"))
-    if os.getenv("GEMINI_BUDGET_CUTOFF_RATIO"):
-        env_override.setdefault("llm", {})["budget_cutoff_ratio"] = float(os.getenv("GEMINI_BUDGET_CUTOFF_RATIO", "0.9"))
-    if os.getenv("CHROMA_COLLECTION_NAME"):
-        env_override.setdefault("app", {})["collection_name"] = os.getenv("CHROMA_COLLECTION_NAME")
+    app_daily_limit = get_runtime_value("APP_DAILY_LIMIT")
+    if app_daily_limit:
+        env_override.setdefault("app", {})["daily_limit"] = int(app_daily_limit)
+
+    max_question_chars = get_runtime_value("APP_MAX_QUESTION_CHARS")
+    if max_question_chars:
+        env_override.setdefault("app", {})["max_question_chars"] = int(max_question_chars)
+
+    chroma_path = get_runtime_value("APP_CHROMA_PATH")
+    if chroma_path:
+        env_override.setdefault("app", {})["chroma_path"] = str(chroma_path)
+
+    if get_runtime_value("APP_ALLOW_DEBUG_TAB", None) is not None:
+        env_override.setdefault("app", {})["allow_debug_tab"] = get_runtime_bool("APP_ALLOW_DEBUG_TAB", True)
+
+    default_law_filter = get_runtime_value("APP_DEFAULT_LAW_FILTER")
+    if default_law_filter:
+        env_override.setdefault("app", {})["default_law_filter"] = str(default_law_filter)
+
+    runtime_dir = get_runtime_value("APP_RUNTIME_DIR")
+    if runtime_dir:
+        env_override.setdefault("data", {})["runtime_dir"] = str(runtime_dir)
+
+    gemini_model_name = get_runtime_value("GEMINI_MODEL_NAME")
+    if gemini_model_name:
+        env_override.setdefault("llm", {})["model_name"] = str(gemini_model_name)
+
+    request_budget = get_runtime_value("GEMINI_DAILY_REQUEST_BUDGET")
+    if request_budget:
+        env_override.setdefault("llm", {})["daily_request_budget"] = int(request_budget)
+
+    token_budget = get_runtime_value("GEMINI_DAILY_TOKEN_BUDGET")
+    if token_budget:
+        env_override.setdefault("llm", {})["daily_token_budget"] = int(token_budget)
+
+    budget_cutoff = get_runtime_value("GEMINI_BUDGET_CUTOFF_RATIO")
+    if budget_cutoff:
+        env_override.setdefault("llm", {})["budget_cutoff_ratio"] = float(budget_cutoff)
+
+    collection_name = get_runtime_value("CHROMA_COLLECTION_NAME")
+    if collection_name:
+        env_override.setdefault("app", {})["collection_name"] = str(collection_name)
 
     merged = _deep_merge(raw, env_override)
     settings = Settings.model_validate(merged)

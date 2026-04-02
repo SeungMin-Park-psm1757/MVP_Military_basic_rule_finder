@@ -4,8 +4,8 @@
 일반적인 법률자문 봇이 아니라 `근거 검색 + 요약 + 원문 링크` 중심으로 설계된 데모 앱입니다.
 
 - 저장소: [GitHub Repository](https://github.com/SeungMin-Park-psm1757/MVP_Military_basic_rule_finder)
-- 실행 페이지: [http://127.0.0.1:8501](http://127.0.0.1:8501)
-  로컬 기본 실행 포트 기준입니다.
+- 권장 웹 배포 링크: [https://military-basic-rule-chatbot.onrender.com](https://military-basic-rule-chatbot.onrender.com)
+  Render 배포 후 활성화되는 공개 주소입니다.
 
 ## 프로젝트 목적
 
@@ -40,6 +40,8 @@
 - Chroma PersistentClient
 - Gemini 2.0 Flash
 - Sentence Transformers
+- Docker
+- Render Blueprint
 
 ## 답변 방식
 
@@ -58,24 +60,36 @@
 - 개정 이유형: `왜 바뀌었`, `개정 이유`, `배경`, `취지`
 - 실무 참고형: `실무`, `적용`, `참고`, `주의`
 
-## 주요 디렉터리
+## 웹 배포
 
-```text
-.
-├─ .agents/skills/
-├─ config/
-├─ data/
-├─ data_manifests/
-├─ docs/
-├─ prompts/
-├─ scripts/
-├─ src/army_reg_rag/
-├─ tests/
-├─ AGENTS.md
-├─ streamlit_app.py
-├─ requirements.txt
-└─ README.md
-```
+이 저장소는 로컬 시연용이 아니라 공개 웹앱으로도 바로 올릴 수 있게 정리되어 있습니다.
+
+### 권장 배포 경로
+
+- 기본 권장: Render + Docker + persistent disk
+- 대안: Streamlit Community Cloud
+
+### 배포에 포함된 파일
+
+- [`render.yaml`](render.yaml)
+  Render Blueprint. `GEMINI_API_KEY`는 `sync: false`로 받아 코드에 넣지 않습니다.
+- [`Dockerfile`](Dockerfile)
+  Streamlit 앱을 `0.0.0.0:$PORT`로 실행하는 컨테이너 설정입니다.
+- [`.streamlit/config.toml`](.streamlit/config.toml)
+  웹 배포용 기본 Streamlit 설정입니다.
+- [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+  push/PR마다 샘플 코퍼스 생성, 적재, 테스트를 검증합니다.
+- [`docs/07_web_deployment.md`](docs/07_web_deployment.md)
+  Render와 Streamlit Community Cloud 기준 상세 배포 가이드입니다.
+
+### 중요한 점
+
+GitHub 저장소의 `Actions secrets`에 `GEMINI_API_KEY`를 넣어도, 실행 중인 웹앱 런타임에 자동 전달되지는 않습니다.
+
+- GitHub Actions secret: CI나 배포 워크플로에서 사용
+- Render secret / Streamlit Cloud secret: 실제 서비스 런타임에서 사용
+
+즉, 웹에서 앱을 띄우려면 호스팅 플랫폼에도 `GEMINI_API_KEY`를 따로 등록해야 합니다.
 
 ## 빠른 시작
 
@@ -89,7 +103,7 @@ pip install -r requirements.txt
 
 ### 2. 환경 변수 설정
 
-`.env.example`을 복사해 `.env`를 만듭니다.
+로컬 개발용으로만 `.env`를 사용합니다. 배포 환경에서는 호스팅 플랫폼의 secrets 또는 env vars를 사용합니다.
 
 ```bash
 copy .env.example .env
@@ -111,7 +125,7 @@ python scripts/build_sample_corpus.py
 python scripts/ingest_to_chroma.py --input data/sample/processed/sample_documents.jsonl
 ```
 
-### 4. 앱 실행
+### 4. 로컬 개발 실행
 
 ```bash
 streamlit run streamlit_app.py
@@ -120,6 +134,8 @@ streamlit run streamlit_app.py
 기본 접속 주소:
 
 - [http://127.0.0.1:8501](http://127.0.0.1:8501)
+
+웹 배포 환경에서는 앱이 빈 저장소일 경우 샘플 코퍼스를 자동 적재합니다.
 
 ## 공개 자료 수집 흐름
 
@@ -161,6 +177,7 @@ streamlit run streamlit_app.py
 - 예시 질문 클릭은 질문 한도 차감 없이, 최신 예시 1건만 대화 영역에 표시합니다.
 - Gemini 사용량은 전역 파일 기준으로 추적하며, 한도 소진 시 `한도 소진(추가 답변이 제한)`만 표시합니다.
 - 근거 영역은 `근거(하단 원문 링크 참고)` 아래에 요약줄과 `원문 링크`를 제공합니다.
+- 웹 배포 환경에서는 첫 실행 시 샘플 코퍼스를 자동 적재합니다.
 
 ## 예시 질문
 
@@ -177,6 +194,7 @@ streamlit run streamlit_app.py
 - [04_evaluation_framework.md](docs/04_evaluation_framework.md)
 - [05_future_internal_rule_ingest_plan.md](docs/05_future_internal_rule_ingest_plan.md)
 - [06_release_review.md](docs/06_release_review.md)
+- [07_web_deployment.md](docs/07_web_deployment.md)
 
 ## 주의사항
 

@@ -807,6 +807,17 @@ def render_bootstrap_panel(store: ChromaStore, rows: list[dict]) -> None:
     st.caption(f"로컬 샘플 코퍼스 {len(rows)}건이 준비되어 있습니다.")
 
 
+def ensure_demo_corpus_loaded(store: ChromaStore) -> bool:
+    settings = get_settings()
+    if store.count() > 0 or not settings.demo_input_path.exists():
+        return False
+    try:
+        ingest_jsonl(str(settings.demo_input_path), store)
+    except Exception:
+        return False
+    return store.count() > 0
+
+
 def render_question_box(max_chars: int) -> tuple[bool, str]:
     question = st.text_area(
         "질문 입력",
@@ -847,6 +858,8 @@ def main():
         st.markdown("<div class='main-shell'>", unsafe_allow_html=True)
         render_intro()
 
+        if store.count() == 0:
+            ensure_demo_corpus_loaded(store)
         if store.count() == 0:
             render_bootstrap_panel(store, rows)
             st.markdown("</div>", unsafe_allow_html=True)

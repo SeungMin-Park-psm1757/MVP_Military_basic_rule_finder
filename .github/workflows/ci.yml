@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build sample corpus
+        run: python scripts/build_sample_corpus.py
+
+      - name: Ingest sample corpus
+        run: python scripts/ingest_to_chroma.py --input data/sample/processed/sample_documents.jsonl
+
+      - name: Run tests
+        run: pytest

@@ -1,0 +1,35 @@
+services:
+  - type: web
+    runtime: docker
+    name: military-basic-rule-chatbot
+    plan: starter
+    region: singapore
+    autoDeployTrigger: checksPass
+    healthCheckPath: /
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL_NAME
+        value: gemini-2.0-flash
+      - key: GEMINI_DAILY_REQUEST_BUDGET
+        value: "200"
+      - key: GEMINI_DAILY_TOKEN_BUDGET
+        value: "1000000"
+      - key: GEMINI_BUDGET_CUTOFF_RATIO
+        value: "0.9"
+      - key: APP_MAX_QUESTION_CHARS
+        value: "600"
+      - key: APP_ALLOW_DEBUG_TAB
+        value: "false"
+      - key: APP_CHROMA_PATH
+        value: /var/data/chroma
+      - key: APP_RUNTIME_DIR
+        value: /var/data/runtime
+      - key: APP_DEFAULT_LAW_FILTER
+        value: 전체
+      - key: CHROMA_COLLECTION_NAME
+        value: army_reg_rag
+    disk:
+      name: app-data
+      mountPath: /var/data
+      sizeGB: 5
