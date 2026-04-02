@@ -1,0 +1,46 @@
+{
+  "name": "military-basic-rule-finder",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
+  "features": {},
+  "forwardPorts": [8501],
+  "portsAttributes": {
+    "8501": {
+      "label": "군인 기본법 챗봇",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "bash scripts/setup_codespaces.sh",
+  "postAttachCommand": "bash scripts/start_codespaces_webapp.sh",
+  "containerEnv": {
+    "APP_ALLOW_DEBUG_TAB": "false",
+    "APP_MAX_QUESTION_CHARS": "600",
+    "CHROMA_COLLECTION_NAME": "army_reg_rag"
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "streamlit_app.py"
+      ]
+    },
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+  "secrets": {
+    "GEMINI_API_KEY": {
+      "description": "Gemini API key used by the Streamlit chat app in GitHub Codespaces.",
+      "documentationUrl": "https://ai.google.dev/gemini-api/docs/api-key"
+    },
+    "LAW_API_KEY": {
+      "description": "Optional law.go.kr Open API key for future full-history ingestion.",
+      "documentationUrl": "https://open.law.go.kr/"
+    }
+  }
+}

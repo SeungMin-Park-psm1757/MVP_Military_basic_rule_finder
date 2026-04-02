@@ -4,8 +4,8 @@
 일반적인 법률자문 봇이 아니라 `근거 검색 + 요약 + 원문 링크` 중심으로 설계된 데모 앱입니다.
 
 - 저장소: [GitHub Repository](https://github.com/SeungMin-Park-psm1757/MVP_Military_basic_rule_finder)
-- 권장 웹 배포 링크: [https://military-basic-rule-chatbot.onrender.com](https://military-basic-rule-chatbot.onrender.com)
-  Render 배포 후 활성화되는 공개 주소입니다.
+- GitHub 실행 링크: [Open in Codespaces](https://codespaces.new/SeungMin-Park-psm1757/MVP_Military_basic_rule_finder?quickstart=1)
+  GitHub Codespaces에서 저장소를 열면 앱이 자동으로 준비되고 미리보기 포트가 열립니다.
 
 ## 프로젝트 목적
 
@@ -60,13 +60,39 @@
 - 개정 이유형: `왜 바뀌었`, `개정 이유`, `배경`, `취지`
 - 실무 참고형: `실무`, `적용`, `참고`, `주의`
 
+## GitHub에서 바로 실행
+
+이 MVP는 GitHub 저장소에서 바로 열어 실행할 수 있도록 `Codespaces` 기준 설정을 포함합니다.
+
+### 가장 빠른 실행 방법
+
+1. 상단의 [Open in Codespaces](https://codespaces.new/SeungMin-Park-psm1757/MVP_Military_basic_rule_finder?quickstart=1) 링크를 엽니다.
+2. Codespace가 생성되면 의존성 설치와 샘플 코퍼스 적재가 자동으로 실행됩니다.
+3. `postAttachCommand`가 Streamlit 앱을 자동 실행합니다.
+4. GitHub가 포트 `8501` 미리보기를 열면 바로 챗봇 페이지를 확인할 수 있습니다.
+
+### Codespaces에 포함된 설정
+
+- [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)
+  포트 자동 공개, 미리보기, 추천 secrets, 자동 실행 명령을 담고 있습니다.
+- [`scripts/setup_codespaces.sh`](scripts/setup_codespaces.sh)
+  패키지 설치, 샘플 코퍼스 생성, Chroma 적재를 처리합니다.
+- [`scripts/start_codespaces_webapp.sh`](scripts/start_codespaces_webapp.sh)
+  Streamlit 서버를 백그라운드로 띄웁니다.
+
+### GitHub secret 관련 주의
+
+GitHub 저장소의 `Actions secrets`는 Codespaces 런타임에 자동 주입되지 않습니다.  
+Codespaces에서 실제 챗봇 응답을 쓰려면 `Codespaces secrets`에도 `GEMINI_API_KEY`를 등록해야 합니다.
+
 ## 웹 배포
 
 이 저장소는 로컬 시연용이 아니라 공개 웹앱으로도 바로 올릴 수 있게 정리되어 있습니다.
 
 ### 권장 배포 경로
 
-- 기본 권장: Render + Docker + persistent disk
+- GitHub에서 바로 실행: Codespaces
+- 외부 공개 URL 배포: Render + Docker + persistent disk
 - 대안: Streamlit Community Cloud
 
 ### 배포에 포함된 파일
@@ -87,9 +113,10 @@
 GitHub 저장소의 `Actions secrets`에 `GEMINI_API_KEY`를 넣어도, 실행 중인 웹앱 런타임에 자동 전달되지는 않습니다.
 
 - GitHub Actions secret: CI나 배포 워크플로에서 사용
+- GitHub Codespaces secret: GitHub Codespaces 런타임에서 사용
 - Render secret / Streamlit Cloud secret: 실제 서비스 런타임에서 사용
 
-즉, 웹에서 앱을 띄우려면 호스팅 플랫폼에도 `GEMINI_API_KEY`를 따로 등록해야 합니다.
+즉, GitHub에서 Codespaces로 실행하든 외부로 배포하든, 해당 런타임에 맞는 secret 저장소에 `GEMINI_API_KEY`를 따로 등록해야 합니다.
 
 ## 빠른 시작
 
