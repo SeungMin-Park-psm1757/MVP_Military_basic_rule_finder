@@ -1,0 +1,30 @@
+app:
+  name: army-reg-rag-mvp
+  timezone: Asia/Seoul
+  daily_limit: 20
+  max_question_chars: 600
+  chroma_path: data/chroma
+  collection_name: army_reg_rag
+  allow_debug_tab: true
+  default_law_filter: 전체
+retrieval:
+  top_k: 6
+  max_evidence_per_source_type: 3
+embedding:
+  model_name: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+  fallback_dim: 384
+llm:
+  model_name: gemini-2.0-flash
+  temperature: 0.1
+  max_output_tokens: 1400
+  daily_request_budget: 200
+  daily_token_budget: 1000000
+  budget_cutoff_ratio: 0.9
+data:
+  demo_input_path: data/sample/processed/sample_documents.jsonl
+  raw_dir: data/raw
+  processed_dir: data/processed
+  runtime_dir: data/runtime
+ui:
+  evidence_preview_chars: 320
+  answer_disclaimer: "이 답변은 법률자문이 아니라 공개 법규 기반의 실무 참고용 안내입니다."

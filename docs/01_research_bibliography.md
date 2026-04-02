@@ -1,0 +1,173 @@
+# 딥리서치 참고문헌 리스트
+
+## 사용 원칙
+
+- 이 문서는 **법규 조문 자체**보다, 논문 본문에서 활용할 **선행연구·정책보고서·정부 가이드·실무자료**를 정리한 목록입니다.
+
+- 본문 인용은 가급적 **학술논문과 OECD/정부 공식문서** 중심으로 하고, 실무자료·블로그·가이드류는 **정책환경·구현환경 설명**에 보조적으로 쓰는 것을 권장합니다.
+
+- 승민님 주제와 직접 연결되는 핵심 축은 ① 공공부문 AI·챗봇, ② 지식관리·조직기억, ③ 법률 AI·시간축 RAG, ④ 한국 정부 AI 정책·행정혁신, ⑤ 코덱스/바이브코딩 구현환경입니다.
+
+## 우선 인용 권고 TOP 15
+
+- **1. Chen, T., Gascó-Hernandez, M., & Esteve, M. (2024). The Adoption and Implementation of Artificial Intelligence Chatbots in Public Organizations: Evidence from U.S. State Governments. American Review of Public Administration, 54(3), 255–270.**  
+  - 활용 포인트: 공공조직에서 챗봇 채택·구현 요인을 실증적으로 다룬 대표 논문. 도입조건·조직요인 서술에 적합.  
+  - 링크: [원문](https://journals.sagepub.com/doi/10.1177/02750740231200522)
+- **2. Larsen, A. G., & Følstad, A. (2024). The impact of chatbots on public service provision: A qualitative interview study with citizens and public service providers. Government Information Quarterly, 41(2), 101927.**  
+  - 활용 포인트: 챗봇이 공공서비스 제공과 시민·공무원 경험에 미치는 영향을 정성적으로 분석. 효과와 한계의 균형 제시에 유용.  
+  - 링크: [원문](https://www.sciencedirect.com/science/article/pii/S0740624X24000194)
+- **3. Cortés-Cediel, M. E., Segura-Tinoco, A., Cantador, I., & Rodríguez Bolívar, M. P. (2023). Trends and challenges of e-government chatbots: Advances in exploring open government data and citizen participation content. Government Information Quarterly, 40, 101877.**  
+  - 활용 포인트: 전자정부 챗봇의 추세·한계를 체계적으로 정리. 정보검색 중심 편중, 공공가치 평가 부재 문제를 논문 문제제기와 직접 연결 가능.  
+  - 링크: [원문](https://repositorio.uam.es/bitstreams/63442cc6-50e2-4a77-8040-44a2ddd8f406/download)
+- **4. Cho, S., Hur, J.-Y., & Kim, D. (2025). Bridging trust in AI and its adoption: The role of organizational support in AI chatbot implementation in Korean government agencies. Government Information Quarterly, 42(4), 102081.**  
+  - 활용 포인트: 한국 정부기관 맥락에서 신뢰와 조직지원이 AI 챗봇 도입에 미치는 영향을 다룸. 한국 맥락 인용에 매우 적합.  
+  - 링크: [원문](https://www.sciencedirect.com/science/article/abs/pii/S0740624X25000759)
+- **7. Kim, E. (2026). Generative AI in public administration: A quasi-experimental analysis of bureaucratic productivity. Government Information Quarterly, 43(1), 102108.**  
+  - 활용 포인트: 생성형 AI가 공무원의 초안작성 시간을 단축한다는 준실험 연구. 업무경감·생산성 논거에 직접 활용 가능.  
+  - 링크: [원문](https://www.sciencedirect.com/science/article/abs/pii/S0740624X26000055)
+- **8. Selten, F., & Klievink, B. (2024). Organizing public sector AI adoption: Navigating between separation and integration. Government Information Quarterly, 41(1), 101885.**  
+  - 활용 포인트: 공공부문 AI 도입에서 중앙화/분산화, 분리/통합의 조직설계 이슈를 분석. 군 조직 적용 논의에 유용.  
+  - 링크: [원문](https://www.sciencedirect.com/science/article/pii/S0740624X23000850)
+- **11. Criado, J. I., Sandoval-Almazán, R., & Gil-Garcia, J. R. (2025). Artificial intelligence and public administration: Understanding actors, governance, and policy from micro, meso, and macro perspectives. Public Policy and Administration, 40(2).**  
+  - 활용 포인트: AI와 공공행정 관계를 미시·중범위·거시 시각으로 정리. 이론틀 구성에 적합.  
+  - 링크: [원문](https://journals.sagepub.com/doi/10.1177/09520767241272921)
+- **15. Massaro, M., Dumay, J., & Garlatti, A. (2015). Public sector knowledge management: a structured literature review. Journal of Knowledge Management, 19(3), 530–558.**  
+  - 활용 포인트: 공공부문 KM 연구를 체계적으로 정리한 고전적 기반 문헌. 조직기억·지식단절 논리의 출발점.  
+  - 링크: [원문](https://www.emerald.com/jkm/article/19/3/530/259388/Public-sector-knowledge-management-a-structured)
+- **16. Adobor, H., Kudonoo, E. C., & Daneshfar, A. (2019). Knowledge management capability and organizational memory: a study of public sector agencies. International Journal of Public Sector Management, 32(6), 671–687.**  
+  - 활용 포인트: 공공기관에서 KM 역량과 조직기억의 관계를 다룸. 보직 순환과 조직기억 문제 연결에 적합.  
+  - 링크: [원문](https://www.emerald.com/ijpsm/article-split/32/6/671/151835/Knowledge-management-capability-and-organizational)
+- **20. Smaliukienė, R., & Giedraitytė, V. (2018). Research Trends in Knowledge Management in Military. Challenges to National Defence in Contemporary Geopolitical Situation, 2018(1), 142–147.**  
+  - 활용 포인트: 군 조직의 지식관리 연구 흐름을 직접 다룬 드문 문헌. 논문의 군 적용 정당화에 중요.  
+  - 링크: [원문](https://journals.lka.lt/journal/cndcgs/article/1201/file/pdf)
+- **24. Pipitone, N., & Houir Alami, G. (2024). LegalBench-RAG: A Benchmark for Retrieval-Augmented Generation in Legal Question Answering.**  
+  - 활용 포인트: 법률 QA에서 retrieval 단계의 중요성과 평가기준을 제시. 본 연구의 성능평가 설계에 유용.  
+  - 링크: [원문](https://arxiv.org/abs/2408.10343)
+- **26. Seo, K., & Utsuro, T. (2025). RAG based Question Answering of Korean Laws and Precedents. In Proceedings of the Eighth FEVER Workshop, 91–100.**  
+  - 활용 포인트: 한국 법령·판례를 대상으로 한 RAG QA 연구. 국내 법률 텍스트를 다루는 직접 근거로 매우 중요.  
+  - 링크: [원문](https://aclanthology.org/2025.fever-1.7/)
+- **27. Kim, J., Jeon, H., Heo, D., Lee, J., & Suh, B. (2025). LegisFlow: Enhancing Korean Legal Research with Temporal-Aware LLM Interfaces. UIST 2025.**  
+  - 활용 포인트: 한국 법률연구에서 시간축(연혁)을 사용자 인터페이스 차원에서 다룬 최신 연구. 본 논문 주제와 매우 밀접.  
+  - 링크: [원문](https://dl.acm.org/doi/10.1145/3746059.3747752)
+- **30. OECD. (2025). Governing with Artificial Intelligence: The State of Play and Way Forward in Core Government Functions.**  
+  - 활용 포인트: 정부 핵심기능에서 AI가 생산성·서비스·의사결정에 미치는 영향을 종합적으로 정리. 국제정책 배경의 핵심 문헌.  
+  - 링크: [원문](https://www.oecd.org/en/publications/governing-with-artificial-intelligence_795de142-en.html)
+- **31. OECD. (2026). Building an AI-ready public workforce.**  
+  - 활용 포인트: 공공조직 내 AI 역량·내재화·책임성 확보를 다룸. 공무원/간부 활용역량과 조직 역량 구축 논리에 적합.  
+  - 링크: [원문](https://www.oecd.org/en/publications/building-an-ai-ready-public-workforce_b89244c7-en.html)
+
+## 공공행정 AI·챗봇
+
+| ID | 우선순위 | 유형 | 참고문헌 | 논문 내 활용 포인트 | 추천 위치 | 링크 |
+|---:|---|---|---|---|---|---|
+| 1 | 핵심 | 논문 | Chen, T., Gascó-Hernandez, M., & Esteve, M. (2024). The Adoption and Implementation of Artificial Intelligence Chatbots in Public Organizations: Evidence from U.S. State Governments. American Review of Public Administration, 54(3), 255–270. | 공공조직에서 챗봇 채택·구현 요인을 실증적으로 다룬 대표 논문. 도입조건·조직요인 서술에 적합. | 선행연구 / 공공부문 AI 도입요인 | [원문](https://journals.sagepub.com/doi/10.1177/02750740231200522) |
+| 2 | 핵심 | 논문 | Larsen, A. G., & Følstad, A. (2024). The impact of chatbots on public service provision: A qualitative interview study with citizens and public service providers. Government Information Quarterly, 41(2), 101927. | 챗봇이 공공서비스 제공과 시민·공무원 경험에 미치는 영향을 정성적으로 분석. 효과와 한계의 균형 제시에 유용. | 선행연구 / 공공서비스 효과 | [원문](https://www.sciencedirect.com/science/article/pii/S0740624X24000194) |
+| 3 | 핵심 | 논문 | Cortés-Cediel, M. E., Segura-Tinoco, A., Cantador, I., & Rodríguez Bolívar, M. P. (2023). Trends and challenges of e-government chatbots: Advances in exploring open government data and citizen participation content. Government Information Quarterly, 40, 101877. | 전자정부 챗봇의 추세·한계를 체계적으로 정리. 정보검색 중심 편중, 공공가치 평가 부재 문제를 논문 문제제기와 직접 연결 가능. | 문제제기 / 선행연구 비판 | [원문](https://repositorio.uam.es/bitstreams/63442cc6-50e2-4a77-8040-44a2ddd8f406/download) |
+| 4 | 핵심 | 논문 | Cho, S., Hur, J.-Y., & Kim, D. (2025). Bridging trust in AI and its adoption: The role of organizational support in AI chatbot implementation in Korean government agencies. Government Information Quarterly, 42(4), 102081. | 한국 정부기관 맥락에서 신뢰와 조직지원이 AI 챗봇 도입에 미치는 영향을 다룸. 한국 맥락 인용에 매우 적합. | 선행연구 / 한국 공공부문 수용성 | [원문](https://www.sciencedirect.com/science/article/abs/pii/S0740624X25000759) |
+| 5 | 중요 | 논문 | Senadheera, S., Yigitcanlar, T., Desouza, K. C., Mossberger, K., Corchado, J., Mehmood, R., Li, R. Y. M., & Cheong, P. H. (2025). Understanding Chatbot Adoption in Local Governments: A Review and Framework. Journal of Urban Technology, 32(3), 35–69. | 지방정부 챗봇 도입을 리뷰와 프레임워크로 정리. 한국 군 행정에 맞게 제도·조직·서비스 관점 변환 가능. | 선행연구 / 도입 프레임워크 | [원문](https://www.tandfonline.com/doi/full/10.1080/10630732.2023.2297665) |
+| 6 | 중요 | 논문 | Chen, T., & Gascó-Hernandez, M. (2025). Uncovering the Results of AI Chatbot Use in the Public Sector: Evidence from U.S. State Governments. Public Performance & Management Review, 48(6), 1331–1356. | 공공부문 챗봇의 실제 성과와 운영결과를 실증적으로 제시. 성과지표 설계 참고에 적합. | 성과평가 설계 / 기대효과 | [원문](https://www.tandfonline.com/doi/full/10.1080/15309576.2024.2389864) |
+| 7 | 핵심 | 논문 | Kim, E. (2026). Generative AI in public administration: A quasi-experimental analysis of bureaucratic productivity. Government Information Quarterly, 43(1), 102108. | 생성형 AI가 공무원의 초안작성 시간을 단축한다는 준실험 연구. 업무경감·생산성 논거에 직접 활용 가능. | 정책효과 / 행정효율성 논거 | [원문](https://www.sciencedirect.com/science/article/abs/pii/S0740624X26000055) |
+| 8 | 핵심 | 논문 | Selten, F., & Klievink, B. (2024). Organizing public sector AI adoption: Navigating between separation and integration. Government Information Quarterly, 41(1), 101885. | 공공부문 AI 도입에서 중앙화/분산화, 분리/통합의 조직설계 이슈를 분석. 군 조직 적용 논의에 유용. | 시스템 거버넌스 / 조직설계 | [원문](https://www.sciencedirect.com/science/article/pii/S0740624X23000850) |
+| 9 | 중요 | 논문 | van Noordt, C., & Misuraca, G. (2022). Artificial intelligence for the public sector: results of landscaping the use of AI in government across the European Union. Government Information Quarterly, 39(3), 101714. | 공공부문 AI 활용 지형을 넓게 보여주는 기초 문헌. 사례지형과 위험/이익 균형 서술에 유용. | 배경 / 공공부문 AI 일반 동향 | [원문](https://www.sciencedirect.com/science/article/pii/S0740624X22000478) |
+| 10 | 중요 | 논문 | Kinder, T., Stenvall, J., Koskimies, E., Webb, H., & Janenova, S. (2023). Local public services and the ethical deployment of artificial intelligence. Government Information Quarterly, 40(4), 101865. | 공공서비스에서 AI 윤리 배치를 다뤄 신뢰·설명가능성·책임성 논의 보강에 좋음. | 한계와 통제 / 윤리·책임성 | [원문](https://www.sciencedirect.com/science/article/pii/S0740624X23000655) |
+| 11 | 중요 | 논문 | Criado, J. I., Sandoval-Almazán, R., & Gil-Garcia, J. R. (2025). Artificial intelligence and public administration: Understanding actors, governance, and policy from micro, meso, and macro perspectives. Public Policy and Administration, 40(2). | AI와 공공행정 관계를 미시·중범위·거시 시각으로 정리. 이론틀 구성에 적합. | 이론적 틀 / 공공행정과 AI | [원문](https://journals.sagepub.com/doi/10.1177/09520767241272921) |
+| 12 | 보조 | 논문 | Zhu, X. (2026). Public administration with, of, and through AI: toward a new paradigm in the era of intelligence. Journal of Chinese Governance, 11(1), 30–57. | AI 시대 공공행정 패러다임 전환을 이론화. 결론부에서 확장적 시야 제시에 적합. | 결론 / 패러다임 전환 | [원문](https://www.tandfonline.com/doi/full/10.1080/23812346.2025.2578589) |
+| 13 | 보조 | 논문 | Riccio, G. (2025). Generative artificial intelligence in public administration: an integrated framework for regulatory compliance, ethical governance, and digital transformation. In Ital-IA 2025 Proceedings. | 규제준수·윤리·디지털 전환을 통합한 공공행정 GenAI 프레임을 제시. 제도적 통제 설계에 참고 가능. | 정책제안 / 통제체계 | [원문](https://ceur-ws.org/Vol-4121/Ital-IA_2025_paper_3.pdf) |
+| 14 | 보조 | 논문 | Porumbescu, G., Young, M., & Yang, K. (2025). Introduction to Special Issue on Generative AI and Public Administration: Performance, Accountability, and Democratic Governance. Public Performance & Management Review, 48(6), 1263–1267. | 생성형 AI와 공공행정의 핵심 쟁점을 압축적으로 보여주는 특집 서문. 배경 정리용. | 서론 / 연구배경 | [원문](https://www.tandfonline.com/doi/full/10.1080/15309576.2025.2570315) |
+
+## 지식관리·조직기억
+
+| ID | 우선순위 | 유형 | 참고문헌 | 논문 내 활용 포인트 | 추천 위치 | 링크 |
+|---:|---|---|---|---|---|---|
+| 15 | 핵심 | 논문 | Massaro, M., Dumay, J., & Garlatti, A. (2015). Public sector knowledge management: a structured literature review. Journal of Knowledge Management, 19(3), 530–558. | 공공부문 KM 연구를 체계적으로 정리한 고전적 기반 문헌. 조직기억·지식단절 논리의 출발점. | 선행연구 / 지식관리 | [원문](https://www.emerald.com/jkm/article/19/3/530/259388/Public-sector-knowledge-management-a-structured) |
+| 16 | 핵심 | 논문 | Adobor, H., Kudonoo, E. C., & Daneshfar, A. (2019). Knowledge management capability and organizational memory: a study of public sector agencies. International Journal of Public Sector Management, 32(6), 671–687. | 공공기관에서 KM 역량과 조직기억의 관계를 다룸. 보직 순환과 조직기억 문제 연결에 적합. | 문제분석 / 연속성·조직기억 | [원문](https://www.emerald.com/ijpsm/article-split/32/6/671/151835/Knowledge-management-capability-and-organizational) |
+| 17 | 중요 | 논문 | Galan, N. (2023). Knowledge loss induced by organizational member turnover: a review of empirical literature, synthesis and future research directions (Part I). The Learning Organization, 30(2), 117–136. | 인사이동·이직이 지식손실을 어떻게 만드는지 정리. 군 보직순환 문제를 일반화하는 데 유용. | 문제분석 / 인사이동과 지식손실 | [원문](https://www.emerald.com/tlo/article/30/2/117/379749/Knowledge-loss-induced-by-organizational-member) |
+| 18 | 중요 | 논문 | Daghfous, A., Amer, N. T., Belkhodja, O., Angell, L. C., & Zoubi, T. (2023). Managing knowledge loss: a systematic literature review and future research directions. Journal of Enterprise Information Management, 36(4), 1008–1031. | 지식손실 완화 전략을 폭넓게 다룬 체계적 문헌고찰. RAG 시스템을 예방적 지식보존 장치로 설명하기 좋음. | 정책제안 / 지식보존 전략 | [원문](https://www.emerald.com/jeim/article/36/4/1008/201212/Managing-knowledge-loss-a-systematic-literature) |
+| 19 | 중요 | 논문 | Stavick, J. (2024). Organizational Memory and Snap Back Performance in Public Agencies. The American Review of Public Administration, 55(2), 175–191. | 공공기관 성과와 조직기억의 관계를 경험적으로 보여줌. 비정기적·예외적 업무 대응력 논거로 적합. | 기대효과 / 정책결정 근거와 대응력 | [원문](https://journals.sagepub.com/doi/10.1177/02750740241305625) |
+| 20 | 중요 | 논문 | Smaliukienė, R., & Giedraitytė, V. (2018). Research Trends in Knowledge Management in Military. Challenges to National Defence in Contemporary Geopolitical Situation, 2018(1), 142–147. | 군 조직의 지식관리 연구 흐름을 직접 다룬 드문 문헌. 논문의 군 적용 정당화에 중요. | 선행연구 / 군 조직 지식관리 | [원문](https://journals.lka.lt/journal/cndcgs/article/1201/file/pdf) |
+| 21 | 중요 | 공식문서 | Joint Chiefs of Staff. (2018). Knowledge and Information Management Focus Paper. | 군 조직에서 KMO(지식관리장교) 역할과 정보·지식 흐름 개선의 중요성을 직접 제시. 군 조직 설계 논거로 강함. | 정책제안 / 군 적용 조직설계 | [원문](https://www.jcs.mil/Portals/36/Documents/Doctrine/fp/knowledge_and_info_fp.pdf?ver=2018-05-17-102808-507) |
+| 22 | 보조 | 논문 | Murnieks, C. Y., Allen, S. T., & Ferrante, C. J. (2011). Combating the effects of turnover: Military lessons learned from project teams rebuilding Iraq. Business Horizons, 54(5), 481–491. | 군 조직의 순환·교대와 지식 손실 문제를 구체 사례로 다룸. 오래된 문헌이지만 메시지가 선명함. | 사례분석 / 군 조직 특수성 | [원문](https://www.sciencedirect.com/science/article/abs/pii/S0007681311000656) |
+| 23 | 보조 | 보고서 | Peschl, M. F., et al. (2025). What does knowledge management in public administrations look like in practice? | 실제 공공행정에서 KM가 어떻게 운영되는지 사례적으로 보여주는 실천 보고서. 정책대안 현실화에 도움. | 정책제안 / 운영모형 | [원문](https://epsa.whu.edu/cms/wp-content/uploads/2025/06/24-0101_Peschl-etal_What-does-knowledge-management-in-public-administrations-look-like-in-practice-.pdf) |
+
+## 법률 AI·RAG
+
+| ID | 우선순위 | 유형 | 참고문헌 | 논문 내 활용 포인트 | 추천 위치 | 링크 |
+|---:|---|---|---|---|---|---|
+| 24 | 핵심 | 논문 | Pipitone, N., & Houir Alami, G. (2024). LegalBench-RAG: A Benchmark for Retrieval-Augmented Generation in Legal Question Answering. | 법률 QA에서 retrieval 단계의 중요성과 평가기준을 제시. 본 연구의 성능평가 설계에 유용. | 방법론 / RAG 평가 | [원문](https://arxiv.org/abs/2408.10343) |
+| 25 | 중요 | 논문 | Wiratunga, N., et al. (2024). CBR-RAG: Case-Based Reasoning for Retrieval Augmented Generation in LLMs for Legal Question Answering. | 법률 문답에서 유사사례 기반 RAG 접근을 보여줌. 향후 D(개정안 작성지원) 확장 논리와 연결 가능. | 향후과제 / 고도화 방향 | [원문](https://arxiv.org/abs/2406.17780) |
+| 26 | 핵심 | 논문 | Seo, K., & Utsuro, T. (2025). RAG based Question Answering of Korean Laws and Precedents. In Proceedings of the Eighth FEVER Workshop, 91–100. | 한국 법령·판례를 대상으로 한 RAG QA 연구. 국내 법률 텍스트를 다루는 직접 근거로 매우 중요. | 선행연구 / 한국 법률 RAG | [원문](https://aclanthology.org/2025.fever-1.7/) |
+| 27 | 핵심 | 논문 | Kim, J., Jeon, H., Heo, D., Lee, J., & Suh, B. (2025). LegisFlow: Enhancing Korean Legal Research with Temporal-Aware LLM Interfaces. UIST 2025. | 한국 법률연구에서 시간축(연혁)을 사용자 인터페이스 차원에서 다룬 최신 연구. 본 논문 주제와 매우 밀접. | 시스템설계 / 시간축 인터페이스 | [원문](https://dl.acm.org/doi/10.1145/3746059.3747752) |
+| 28 | 중요 | 논문 | Seo, J., Jung, D., Lee, J., Chun, Y., Kim, D., et al. (2025). KoLEG: On-the-Fly Korean Legal Knowledge Editing with Continuous Retrieval. Findings of ACL: EMNLP 2025. | 한국 법률 지식의 연속적 개정 반영을 retrieval 기반으로 다룸. ‘법이 바뀌면 시스템도 같이 바뀌어야 한다’는 논리 보강. | 시스템설계 / 지속 업데이트 | [원문](https://github.com/ekgus9/KoLEG) |
+| 29 | 중요 | 논문 | de Martim, H. (2025). An Ontology-Driven Graph RAG for Legal Norms: A Structural, Temporal, and Deterministic Approach. | 법규의 계층·시간·행위 구조를 반영하는 그래프 기반 RAG를 제시. 단순 벡터검색의 한계 비판에 적합. | 시스템설계 / 향후 고도화 | [원문](https://arxiv.org/abs/2505.00039) |
+
+## 정책·국제기구
+
+| ID | 우선순위 | 유형 | 참고문헌 | 논문 내 활용 포인트 | 추천 위치 | 링크 |
+|---:|---|---|---|---|---|---|
+| 30 | 핵심 | 보고서 | OECD. (2025). Governing with Artificial Intelligence: The State of Play and Way Forward in Core Government Functions. | 정부 핵심기능에서 AI가 생산성·서비스·의사결정에 미치는 영향을 종합적으로 정리. 국제정책 배경의 핵심 문헌. | 정책배경 / 국제동향 | [원문](https://www.oecd.org/en/publications/governing-with-artificial-intelligence_795de142-en.html) |
+| 31 | 핵심 | 보고서 | OECD. (2026). Building an AI-ready public workforce. | 공공조직 내 AI 역량·내재화·책임성 확보를 다룸. 공무원/간부 활용역량과 조직 역량 구축 논리에 적합. | 정책제안 / 인력·역량 | [원문](https://www.oecd.org/en/publications/building-an-ai-ready-public-workforce_b89244c7-en.html) |
+| 32 | 중요 | 보고서 | OECD. (2025). Digital Government Review of Korea. | 한국 디지털정부와 AI 활용 사례를 국제적 시각에서 정리. 한국 정책 맥락 정당화에 유리. | 정책배경 / 한국 디지털정부 | [원문](https://www.oecd.org/en/publications/digital-government-review-of-korea_9defc197-en/full-report/assessment-and-recommendations_cf4945e3.html) |
+| 33 | 중요 | 공식문서 | 대한민국 법률. (2026). 인공지능 발전과 신뢰 기반 조성 등에 관한 기본법 [시행 2026.1.22.]. | 한국 AI 활성화·안전·신뢰 정책의 제도적 기반. 법규 자체 분석보다는 정책 환경 설명용으로 사용. | 정책배경 / 제도환경 | [원문](https://www.law.go.kr/법령/인공지능발전과신뢰기반조성등에관한기본법) |
+| 34 | 중요 | 공식문서 | 과학기술정보통신부. (2025). 인공지능 산업 발전과 안전·신뢰 기반 조성을 위한 「인공지능 기본법 시행령」 제정안 입법예고. | AI 기본법 시행을 둘러싼 실제 제도화 과정을 보여줌. 최근성 확보용. | 정책배경 / 최근 정부 시책 | [원문](https://www.korea.kr/briefing/pressReleaseView.do?newsId=156727787) |
+| 35 | 중요 | 정책문서 | 한국지능정보원(NIA). (2025). 『대한민국 인공지능 행동계획』(안). | 정부의 AI 확산 방향과 인프라·인재·활용 전략을 종합적으로 보여줌. | 정책배경 / 국가 AI 전략 | [원문](https://nia.or.kr/common/board/Download.do?bcIdx=28937&cbIdx=99952&fileNo=1) |
+| 36 | 핵심 | 가이드라인 | 한국지능정보원(NIA). (2024). 공공부문 초거대 AI 도입·활용 가이드라인. | 공공부문에서 생성형 AI를 어떻게 도입·활용할지 직접 다룬 한국형 가이드. 설계 원칙에 매우 유용. | 시스템설계 / 공공부문 구현원칙 | [원문](https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?bcIdx=26677&cbIdx=99852&parentSeq=26677) |
+| 37 | 중요 | 보고서 | 한국지능정보원(NIA). (2025). AI 활용 정부 서비스의 사례와 유형 분석. | 정부 서비스에서 AI 활용 사례를 유형화. MVP의 활용 시나리오와 확장 논거 구성에 유리. | 사례분석 / 공공부문 AI 사례 | [원문](https://www.nia.or.kr/common/board/Download.do?bcIdx=28633&cbIdx=65684&fileNo=2) |
+| 38 | 보조 | 보고서 | 한국지능정보원(NIA). (2025). 지속가능한 공공 파운데이션 모델 구축 및 활용 방안 연구. | 공공 파운데이션 모델과 공공영역 AI 인프라 논의를 다룸. 향후 군 내부 폐쇄망 확대 논의에 적합. | 향후과제 / 공공 AI 인프라 | [원문](https://nia.or.kr/common/board/Download.do?bcIdx=28168&cbIdx=82618&fileNo=1) |
+| 39 | 핵심 | 가이드라인 | 인사혁신처. (2025). 인공지능(AI) 업무활용 가이드. | 실제 공무원이 AI를 업무에 활용하는 프롬프트와 사례를 제공. 본 연구의 실무적 필요성 뒷받침. | 문제분석 / 공무원 업무변화 | [원문](https://www.mpm.go.kr/mpm/comm/pblcateList/?boardId=bbs_0000000000000036&category=&cntId=920&mode=view&pageIdx=) |
+| 40 | 중요 | 보도자료 | 인사혁신처. (2025.3.20). 공직사회의 AI 활용역량을 높이기 위한 ‘인공지능(AI) 업무활용 가이드’ 발간. | 공직 내부 TF가 법령·지침·Q&A 데이터 학습을 통해 복잡한 인사 규정 확인 업무 효율을 높였다는 실제 사례를 제공. | 문제분석 / 실무 사례 | [원문](https://www.mpm.go.kr/mpm/comm/newsPress/newsPressRelease/?boardId=bbs_0000000000000029&category=&cntId=4032&mode=view&pageIdx=) |
+| 41 | 핵심 | 보도자료 | 행정안전부. (2025.11.24). 범정부 AI 공통기반 서비스 개시. | 정부 내부망에서 보안 우려 없이 AI를 활용하는 공통기반 사례. 군 내부망 확장 논의에 직접 유의미. | 정책제안 / 도입 여건 | [원문](https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=121943) |
+| 42 | 중요 | 업무계획 | 행정안전부. (2025). 주요업무 추진계획. | 범정부 AI 공통기반과 지능형 업무관리 플랫폼 확산 계획을 보여줌. 정책 연계성 설명에 유용. | 정책배경 / 정부 추진방향 | [원문](https://www.mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_0014136882EEs89&fileSn=1) |
+| 43 | 중요 | 정책뉴스 | 행정안전부. (2025.9.24). 2030년까지 공공분야 AI 전문가 2만 명 양성. | 공공부문 AI 내재화의 인력전략을 보여줌. 군 행정 AI 역량화 논거에 유리. | 정책제안 / 인력양성 | [원문](https://www.korea.kr/news/policyNewsView.do?newsId=148949910) |
+| 44 | 중요 | 가이드라인 | 개인정보보호위원회. (2025). 생성형 인공지능(AI) 개발·활용을 위한 개인정보 처리 안내서. | 생성형 AI 수명주기 전반의 개인정보 처리 기준을 제시. 군 행정 활용 시 위험통제 설계에 중요. | 한계와 통제 / 개인정보 | [원문](https://www.privacy.go.kr/front/bbs/bbsView.do?bbsNo=BBSMSTR_000000000049&bbscttNo=20836) |
+| 45 | 보조 | 가이드라인 | 개인정보보호위원회. (2025). 개인정보 영향평가 수행안내서(2025.10 개정). | 공공기관 AI 도입 시 영향평가 기준 반영에 도움. 향후 제도화 로드맵에 활용 가능. | 정책제안 / 안전성·평가 | [원문](https://www.privacy.go.kr/front/bbs/bbsView.do?bbsNo=BBSMSTR_000000000049&bbscttNo=20848) |
+| 46 | 보조 | 정책보고서 | 김병우. (2025). 한국 AI 정책 현황 및 발전 방안: OECD AI 원칙을 중심으로. KISDI Perspectives. | 한국 AI 정책의 최근 흐름을 정리. 국내 정책 맥락 서술에 보강용으로 적합. | 정책배경 / 국내 AI 정책 | [원문](https://library.kisdi.re.kr/main.do/10220/contents/4334696?articleId=1875076&checkinId=3710552) |
+
+## 구현·에이전트 코딩
+
+| ID | 우선순위 | 유형 | 참고문헌 | 논문 내 활용 포인트 | 추천 위치 | 링크 |
+|---:|---|---|---|---|---|---|
+| 47 | 중요 | 공식문서 | OpenAI. (2025). Introducing Codex. | 코덱스를 활용한 에이전트형 개발의 개요. 구현 패키지의 도구 정당화에 사용 가능. | 구현방법 / 개발도구 | [원문](https://openai.com/index/introducing-codex/) |
+| 48 | 중요 | 공식블로그 | OpenAI. (2026). Using skills to accelerate OSS maintenance. | 리포지토리 로컬 스킬과 AGENTS.md를 활용한 반복작업 자동화 사례. 코덱스 스킬 설계 근거로 적합. | 구현방법 / Codex 스킬 | [원문](https://developers.openai.com/blog/skills-agents-sdk/) |
+| 49 | 중요 | 공식문서 | OpenAI. (2026). Skills in OpenAI API. | SKILL.md 구조와 스킬 번들 개념을 설명. 실제 프로젝트 폴더 설계에 직접 필요. | 구현방법 / 프로젝트 구조 | [원문](https://developers.openai.com/cookbook/examples/skills_in_api/) |
+| 50 | 보조 | 실무자료 | Google Cloud. (2026). Vibe Coding Explained: Tools and Guides. | 바이브 코딩 개념을 설명하는 실무자료. 본문보다는 부록/개발환경 설명에 적합. | 부록 / 개발방법론 | [원문](https://cloud.google.com/transform/vibe-coding-explained) |
+| 51 | 중요 | 공식문서 | Google AI for Developers. (2026). Gemini API quickstart. | Gemini API 무료 키 발급과 google-genai SDK 사용 시작점. MVP 실행 문서의 핵심. | 구현방법 / LLM 연동 | [원문](https://ai.google.dev/gemini-api/docs/quickstart) |
+| 52 | 중요 | 공식문서 | Google AI for Developers. (2026). Migrate to the Google GenAI SDK. | 레거시 라이브러리 대신 최신 google-genai SDK 사용을 권고. 패키지 최신화 근거. | 구현방법 / SDK 선택 | [원문](https://ai.google.dev/gemini-api/docs/migrate) |
+| 53 | 중요 | 공식문서 | Google AI for Developers. (2026). Generating content / Text generation / API key docs. | Gemini generate_content 호출 구조와 API key 설정의 공식 기준. | 구현방법 / API 호출 예시 | [원문](https://ai.google.dev/api/generate-content) |
+| 54 | 중요 | 공식문서 | Chroma. (2026). PersistentClient, Metadata Filtering, Query and Get docs. | 로컬 persist DB와 메타데이터 필터링 구현의 공식 근거. | 구현방법 / 벡터DB | [원문](https://docs.trychroma.com/reference/python/client) |
+| 55 | 중요 | 공식문서 | 법제처 국가법령정보 공동활용. (2026). OPEN API 활용가이드. | 현행법령, 연혁, 신구법, 행정규칙 신구법 등 데이터 파이프라인 설계의 공식 기준. | 구현방법 / 데이터 수집 | [원문](https://open.law.go.kr/LSO/openApi/guideList.do) |
+
+## 승민님 논문에 바로 연결되는 인용 조합 예시
+
+### 1) 문제제기(행정 효율화 + 지식 단절)
+
+- Massaro et al. (2015), Adobor et al. (2019), Galan (2023), Smaliukienė & Giedraitytė (2018)
+
+- 인사이동·조직기억·공공부문 KM·군 조직 KM을 한 흐름으로 묶을 수 있습니다.
+
+
+### 2) 공공부문 AI·챗봇 도입 논거
+
+- Chen et al. (2024), Larsen & Følstad (2024), Cortés-Cediel et al. (2023), Cho et al. (2025), Selten & Klievink (2024)
+
+- ‘단순 FAQ를 넘어 행정지원형 챗봇’이라는 논지를 강화하기 좋습니다.
+
+
+### 3) 한국 정부 정책환경 연결
+
+- OECD (2025, 2026), NIA (2024, 2025), 인사혁신처 (2025), 행정안전부 (2025), 개인정보보호위원회 (2025), AI 기본법(2026)
+
+- 본 연구가 고립된 아이디어가 아니라 **현재 정부 AI 행정혁신 흐름과 맞닿아 있음**을 보여줍니다.
+
+
+### 4) 기술적 차별점(RAG + 시간축 + 개정이유)
+
+- LegalBench-RAG, Seo & Utsuro (2025), LegisFlow (2025), KoLEG (2025), de Martim (2025)
+
+- ‘현행 법규만 검색하는 챗봇’이 아니라 **연혁·개정이유·시점 추적형 법령 RAG**라는 차별성을 강조할 수 있습니다.
+
+
+### 5) 구현 방법론(코덱스 + 바이브코딩)
+
+- OpenAI Codex 공식문서, Skills 문서, Gemini quickstart, Chroma docs
+
+- 본문보다는 **부록, 구현설명, GitHub README**에서 활용하는 것이 자연스럽습니다.

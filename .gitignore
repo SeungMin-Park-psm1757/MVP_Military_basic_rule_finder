@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.streamlit/secrets.toml
+data/chroma/
+data/runtime/
+data/raw/downloads/
+data/processed/*.jsonl
+!data/sample/processed/sample_documents.jsonl
+.DS_Store
+.pytest_cache/
