@@ -2,7 +2,7 @@ services:
   - type: web
     runtime: docker
     name: military-basic-rule-chatbot
-    plan: starter
+    plan: free
     region: singapore
     autoDeployTrigger: checksPass
     healthCheckPath: /
@@ -22,14 +22,10 @@ services:
       - key: APP_ALLOW_DEBUG_TAB
         value: "false"
       - key: APP_CHROMA_PATH
-        value: /var/data/chroma
+        value: /tmp/chroma
       - key: APP_RUNTIME_DIR
-        value: /var/data/runtime
+        value: /tmp/runtime
       - key: APP_DEFAULT_LAW_FILTER
         value: 전체
       - key: CHROMA_COLLECTION_NAME
         value: army_reg_rag
-    disk:
-      name: app-data
-      mountPath: /var/data
-      sizeGB: 5

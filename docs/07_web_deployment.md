@@ -1,7 +1,7 @@
 # 웹 배포 가이드
 
 이 저장소는 로컬 실행뿐 아니라 GitHub와 외부 웹 배포를 전제로 정리되어 있습니다.  
-가장 빠른 GitHub 실행 경로는 `Codespaces`이며, 외부 공개 URL이 필요하면 `Render + Docker + persistent disk`를 권장합니다.
+가장 빠른 GitHub 실행 경로는 `Codespaces`이며, 외부 공개 URL이 필요하면 `Render + Docker`를 권장합니다.
 
 ## 1. GitHub에서 바로 실행: Codespaces
 
@@ -39,9 +39,24 @@
 
 ### 왜 Render를 권장하나
 
-- Chroma 저장 경로와 사용량 추적 파일을 persistent disk에 유지할 수 있습니다.
-- 앱이 재시작되어도 샘플 벡터 저장소와 전역 사용량 파일이 같이 유지됩니다.
 - `render.yaml`의 `sync: false`를 사용해 API 키를 코드에 넣지 않고 주입할 수 있습니다.
+- Docker 기반이라 현재 Streamlit 앱 구조를 거의 그대로 올릴 수 있습니다.
+- 무료 web service 인스턴스를 공식 지원합니다.
+
+### 현재 저장소 기준 배포 방식
+
+이 저장소의 [`render.yaml`](../render.yaml)은 현재 `plan: free` 기준으로 맞춰져 있습니다.
+
+- Chroma 경로: `/tmp/chroma`
+- runtime 경로: `/tmp/runtime`
+- 첫 실행 시 샘플 코퍼스 자동 적재
+
+### 무료 플랜 한계
+
+- Render free web service는 15분 유휴 시 spin-down 됩니다.
+- 다음 요청이 오면 다시 기동되며, 약 1분 정도 걸릴 수 있습니다.
+- free web service는 영구 디스크를 지원하지 않습니다.
+- 따라서 로컬 파일 기반 Chroma와 사용량 추적 파일은 재시작·재배포·spin-down 시 초기화될 수 있습니다.
 
 ## 3. 대안 경로: Streamlit Community Cloud
 
