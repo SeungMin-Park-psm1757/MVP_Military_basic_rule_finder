@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 from collections import defaultdict
-import html
-import json
 
 from scripts._bootstrap import ensure_project_src_on_path
 
 ensure_project_src_on_path()
 
 import streamlit as st
-import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 from army_reg_rag.config import load_settings
@@ -479,119 +476,11 @@ def build_evidence_summary_line(hit: SearchHit, index: int) -> str:
     return f"[{index}] {' / '.join(meta)} - {preview}"
 
 
-def render_copyable_evidence_summary(hits: list[SearchHit]) -> None:
+def render_evidence_summary(hits: list[SearchHit]) -> None:
     summary_lines = [build_evidence_summary_line(hit, idx) for idx, hit in enumerate(hits[:5], start=1)]
-    row_html = []
-    for index, line in enumerate(summary_lines):
-        safe_line = html.escape(line)
-        copy_payload = json.dumps(line, ensure_ascii=False)
-        row_html.append(
-            f"""
-            <div class="evidence-row">
-                <div class="evidence-text">{safe_line}</div>
-                <button class="copy-btn" onclick='copyEvidence({copy_payload}, this)' title="복사">📋</button>
-            </div>
-            """
-        )
-
-    block = f"""
-    <style>
-      body {{
-        margin: 0;
-        font-family: "Noto Sans KR", sans-serif;
-        color: #17212b;
-        background: transparent;
-      }}
-      .evidence-list {{
-        display: flex;
-        flex-direction: column;
-        gap: 0.55rem;
-      }}
-      .evidence-row {{
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 0.7rem;
-        border: 1px solid rgba(23, 33, 43, 0.10);
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.78);
-        padding: 0.65rem 0.75rem;
-      }}
-      .evidence-text {{
-        flex: 1;
-        font-size: 0.88rem;
-        line-height: 1.5;
-        white-space: normal;
-        word-break: keep-all;
-      }}
-      .copy-btn {{
-        border: 1px solid rgba(23, 33, 43, 0.12);
-        background: #ffffff;
-        border-radius: 999px;
-        width: 2rem;
-        height: 2rem;
-        cursor: pointer;
-        flex-shrink: 0;
-      }}
-    </style>
-    <div class="evidence-list">
-      {''.join(row_html)}
-    </div>
-    <script>
-      async function copyEvidence(text, button) {{
-        const original = button.textContent;
-        try {{
-          if (navigator.clipboard && window.isSecureContext) {{
-            await navigator.clipboard.writeText(text);
-          }} else {{
-            const area = document.createElement('textarea');
-            area.value = text;
-            document.body.appendChild(area);
-            area.select();
-            document.execCommand('copy');
-            document.body.removeChild(area);
-          }}
-          button.textContent = '✓';
-        }} catch (err) {{
-          button.textContent = '!';
-        }}
-        setTimeout(() => {{
-          button.textContent = original;
-        }}, 1200);
-      }}
-    </script>
-    """
-    components.html(block, height=72 + (len(summary_lines) * 74), scrolling=False)
-
-
-def render_live_counter_bridge(max_chars: int) -> None:
-    components.html(
-        f"""
-        <script>
-          const doc = window.parent.document;
-          const attach = () => {{
-            const textarea = doc.querySelector('textarea[aria-label="질문 입력"]');
-            const counter = doc.getElementById('live-question-counter');
-            if (!textarea || !counter) {{
-              window.setTimeout(attach, 120);
-              return;
-            }}
-            const update = () => {{
-              counter.textContent = `${{textarea.value.length}}/{max_chars}`;
-            }};
-            if (!textarea.dataset.counterBound) {{
-              textarea.dataset.counterBound = '1';
-              textarea.addEventListener('input', update);
-              textarea.addEventListener('keyup', update);
-              textarea.addEventListener('change', update);
-            }}
-            update();
-          }};
-          attach();
-        </script>
-        """,
-        height=0,
-    )
+    if not summary_lines:
+        return
+    st.code("\n".join(summary_lines), language="text")
 
 
 def render_chat_history(preview_chars: int, all_source_types: list[str], allow_debug: bool) -> None:
@@ -628,7 +517,7 @@ def render_chat_history(preview_chars: int, all_source_types: list[str], allow_d
                 st.markdown("<div class='evidence-block-title'>근거(하단 원문 링크 참고)</div>", unsafe_allow_html=True)
                 if message.get("answer_backend"):
                     st.caption(BACKEND_LABELS.get(message["answer_backend"], message["answer_backend"]))
-                render_copyable_evidence_summary(message["evidence"])
+                render_evidence_summary(message["evidence"])
                 with st.expander("원문 링크", expanded=False):
                     render_grouped_evidence(message["evidence"], preview_chars)
             if allow_debug:
@@ -807,17 +696,6 @@ def render_bootstrap_panel(store: ChromaStore, rows: list[dict]) -> None:
     st.caption(f"로컬 샘플 코퍼스 {len(rows)}건이 준비되어 있습니다.")
 
 
-def ensure_demo_corpus_loaded(store: ChromaStore) -> bool:
-    settings = get_settings()
-    if store.count() > 0 or not settings.demo_input_path.exists():
-        return False
-    try:
-        ingest_jsonl(str(settings.demo_input_path), store)
-    except Exception:
-        return False
-    return store.count() > 0
-
-
 def render_question_box(max_chars: int) -> tuple[bool, str]:
     question = st.text_area(
         "질문 입력",
@@ -832,14 +710,13 @@ def render_question_box(max_chars: int) -> tuple[bool, str]:
             f"<div id='live-question-counter' class='question-footer-copy'>{len(question)}/{max_chars}</div>",
             unsafe_allow_html=True,
         )
-        render_live_counter_bridge(max_chars)
     with footer_col_2:
         submitted = st.button("전송", key="send_question", type="primary", use_container_width=True)
     return submitted, question
 
 
 def main():
-    st.set_page_config(page_title="군인 기본법 법규 챗봇", page_icon="§", layout="wide")
+    st.set_page_config(page_title="군인 기본법 법규 챗봇", layout="wide")
     inject_styles()
     settings = get_settings()
     ensure_session_state()
@@ -858,8 +735,6 @@ def main():
         st.markdown("<div class='main-shell'>", unsafe_allow_html=True)
         render_intro()
 
-        if store.count() == 0:
-            ensure_demo_corpus_loaded(store)
         if store.count() == 0:
             render_bootstrap_panel(store, rows)
             st.markdown("</div>", unsafe_allow_html=True)

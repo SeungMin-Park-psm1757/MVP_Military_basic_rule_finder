@@ -34,15 +34,15 @@ def ensure_demo_corpus() -> None:
     store = ChromaStore(settings)
     current_count = store.count()
     if current_count > 0:
-        print(f"Chroma collection already contains {current_count} chunks.")
+        print(f"Chroma collection already contains {current_count} chunks.", flush=True)
         return
 
     if not settings.demo_input_path.exists():
-        print(f"Demo input missing at {settings.demo_input_path}; skipping bootstrap.", file=sys.stderr)
+        print(f"Demo input missing at {settings.demo_input_path}; skipping bootstrap.", file=sys.stderr, flush=True)
         return
 
     count = ingest_jsonl(str(settings.demo_input_path), store)
-    print(f"Bootstrapped {count} demo chunks into '{settings.app.collection_name}'.")
+    print(f"Bootstrapped {count} demo chunks into '{settings.app.collection_name}'.", flush=True)
 
 
 def main() -> None:
@@ -50,7 +50,7 @@ def main() -> None:
     try:
         ensure_demo_corpus()
     except Exception as exc:
-        print(f"Render bootstrap warning: {exc}", file=sys.stderr)
+        print(f"Render bootstrap warning: {exc}", file=sys.stderr, flush=True)
 
     port = os.getenv("PORT", "8501")
     os.execvpe(
@@ -67,6 +67,12 @@ def main() -> None:
             port,
             "--server.headless",
             "true",
+            "--server.enableCORS",
+            "false",
+            "--server.enableXsrfProtection",
+            "false",
+            "--server.enableWebsocketCompression",
+            "false",
         ],
         os.environ,
     )
