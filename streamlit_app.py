@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from army_reg_rag.config import load_settings
 from army_reg_rag.domain.models import SearchHit
 from army_reg_rag.llm.gemini_client import QUOTA_BLOCK_MESSAGE
+from army_reg_rag.llm.usage_tracker import GeminiUsageTracker
 from army_reg_rag.retrieval.chroma_store import ChromaStore
 from army_reg_rag.services.answer_service import AnswerService
 from army_reg_rag.services.ingest_service import ingest_jsonl
@@ -71,6 +72,12 @@ def get_store():
 def get_answer_service():
     settings = get_settings()
     return AnswerService(settings, store=get_store())
+
+
+@st.cache_resource
+def get_usage_tracker():
+    settings = get_settings()
+    return GeminiUsageTracker(settings)
 
 
 def inject_styles() -> None:
@@ -369,22 +376,22 @@ def ensure_session_state() -> None:
         st.session_state.clear_question_input = False
 
 
-def global_quota_snapshot(service: AnswerService) -> dict:
-    return service.client.usage_tracker.snapshot()
+def global_quota_snapshot() -> dict:
+    return get_usage_tracker().snapshot()
 
 
-def remaining_global_questions(service: AnswerService) -> int:
-    snapshot = global_quota_snapshot(service)
+def remaining_global_questions() -> int:
+    snapshot = global_quota_snapshot()
     return int(snapshot.get("remaining_requests", 0))
 
 
-def validate_question(question: str, service: AnswerService, max_chars: int) -> str | None:
+def validate_question(question: str, max_chars: int) -> str | None:
     stripped = question.strip()
     if not stripped:
         return "질문을 입력해 주세요."
     if len(stripped) > max_chars:
         return f"질문은 최대 {max_chars}자까지 입력할 수 있습니다."
-    snapshot = global_quota_snapshot(service)
+    snapshot = global_quota_snapshot()
     if not snapshot.get("can_generate", False):
         return QUOTA_BLOCK_MESSAGE
     return None
@@ -532,8 +539,7 @@ def render_chat_history(preview_chars: int, all_source_types: list[str], allow_d
                     )
 
 
-def render_quota_panel(service: AnswerService) -> None:
-    usage = service.client.usage_tracker.snapshot()
+def render_quota_panel(usage: dict) -> None:
     budget_ratio = float(usage.get("budget_ratio", 0.0))
     request_count = int(usage.get("request_count", 0))
     request_soft_limit = int(usage.get("request_soft_limit", 0))
@@ -555,10 +561,15 @@ def render_quota_panel(service: AnswerService) -> None:
     st.caption(f"오늘 허용 질문 {request_count}/{request_soft_limit or '-'}")
 
 
-def render_sidebar(law_options: list[str], source_type_options: list[str], source_type_filter_groups: list[str], service: AnswerService) -> tuple[str, list[str]]:
+def render_sidebar(
+    law_options: list[str],
+    source_type_options: list[str],
+    source_type_filter_groups: list[str],
+    quota_snapshot: dict,
+) -> tuple[str, list[str]]:
     settings = get_settings()
     with st.sidebar:
-        render_quota_panel(service)
+        render_quota_panel(quota_snapshot)
         st.divider()
 
         st.header("검색 필터")
@@ -610,6 +621,21 @@ def _store_answer(result, law_name: str, source_types: list[str], *, replace_his
         st.session_state.chat_history.extend(messages)
 
 
+def ensure_store_ready() -> ChromaStore:
+    settings = get_settings()
+    store = get_store()
+    if store.count() > 0:
+        return store
+    if settings.demo_input_path.exists():
+        ingest_jsonl(str(settings.demo_input_path), store)
+    return store
+
+
+def get_ready_answer_service() -> AnswerService:
+    ensure_store_ready()
+    return get_answer_service()
+
+
 def handle_chat_submission(
     question: str,
     *,
@@ -618,7 +644,7 @@ def handle_chat_submission(
     source_types: list[str],
     settings,
 ) -> None:
-    error = validate_question(question, service, settings.app.max_question_chars)
+    error = validate_question(question, settings.app.max_question_chars)
     if error:
         if error == QUOTA_BLOCK_MESSAGE:
             st.session_state.chat_history.extend(
@@ -637,7 +663,7 @@ def handle_chat_submission(
                         "evidence": [],
                         "answer_backend": "quota_blocked",
                         "answer_notice": "",
-                        "quota_snapshot": global_quota_snapshot(service),
+                        "quota_snapshot": global_quota_snapshot(),
                         "law_name": law_name,
                         "source_types": list(source_types),
                     },
@@ -674,7 +700,7 @@ def handle_example_click(
     st.rerun()
 
 
-def render_bootstrap_panel(store: ChromaStore, rows: list[dict]) -> None:
+def render_bootstrap_panel(rows: list[dict]) -> None:
     settings = get_settings()
     st.warning("아직 컬렉션이 비어 있습니다. 아래 버튼으로 데모 코퍼스를 자동 적재하거나 README 절차를 먼저 실행해 주세요.")
     col1, col2 = st.columns([1, 1.1])
@@ -682,7 +708,7 @@ def render_bootstrap_panel(store: ChromaStore, rows: list[dict]) -> None:
         if st.button("데모 코퍼스 자동 적재", use_container_width=True):
             if settings.demo_input_path.exists():
                 with st.spinner("데모 코퍼스를 적재하고 있습니다..."):
-                    ingest_jsonl(str(settings.demo_input_path), store)
+                    ingest_jsonl(str(settings.demo_input_path), get_store())
                 st.success("데모 코퍼스를 적재했습니다. 화면을 다시 불러옵니다.")
                 st.rerun()
             else:
@@ -721,22 +747,25 @@ def main():
     settings = get_settings()
     ensure_session_state()
 
-    store = get_store()
-    service = get_answer_service()
     rows = load_corpus_rows()
 
     law_options = load_law_options(rows)
     source_type_options = load_source_type_options(rows)
     source_type_filter_groups = load_source_type_filter_groups(rows)
-    selected_law, selected_source_types = render_sidebar(law_options, source_type_options, source_type_filter_groups, service)
+    selected_law, selected_source_types = render_sidebar(
+        law_options,
+        source_type_options,
+        source_type_filter_groups,
+        global_quota_snapshot(),
+    )
 
     _, center_col, _ = st.columns([1.1, 6.2, 1.1])
     with center_col:
         st.markdown("<div class='main-shell'>", unsafe_allow_html=True)
         render_intro()
 
-        if store.count() == 0:
-            render_bootstrap_panel(store, rows)
+        if not rows:
+            render_bootstrap_panel(rows)
             st.markdown("</div>", unsafe_allow_html=True)
             return
 
@@ -744,6 +773,7 @@ def main():
         example_question = render_example_buttons()
 
         if example_question:
+            service = get_ready_answer_service()
             handle_example_click(
                 example_question,
                 service=service,
@@ -751,6 +781,7 @@ def main():
                 source_types=selected_source_types,
             )
         elif form_submitted:
+            service = get_ready_answer_service()
             handle_chat_submission(
                 typed_question,
                 service=service,

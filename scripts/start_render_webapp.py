@@ -4,16 +4,9 @@ import os
 import sys
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 from _bootstrap import ensure_project_src_on_path
 
 ensure_project_src_on_path()
-
-from build_sample_corpus import main as build_sample_corpus
-from army_reg_rag.config import load_settings
-from army_reg_rag.retrieval.chroma_store import ChromaStore
-from army_reg_rag.services.ingest_service import ingest_jsonl
 
 
 def configure_env() -> None:
@@ -24,8 +17,25 @@ def configure_env() -> None:
     os.environ.setdefault("STREAMLIT_BROWSER_GATHER_USAGE_STATS", "false")
 
 
+def has_bootstrapped_chroma() -> bool:
+    chroma_path = Path(os.environ["APP_CHROMA_PATH"])
+    if not chroma_path.exists():
+        return False
+    return any(chroma_path.iterdir())
+
+
 def ensure_demo_corpus() -> None:
     sample_path = Path("data/sample/processed/sample_documents.jsonl")
+    if has_bootstrapped_chroma():
+        print("Chroma bootstrap files already exist.", flush=True)
+        return
+
+    from dotenv import load_dotenv
+    from build_sample_corpus import main as build_sample_corpus
+    from army_reg_rag.config import load_settings
+    from army_reg_rag.retrieval.chroma_store import ChromaStore
+    from army_reg_rag.services.ingest_service import ingest_jsonl
+
     if not sample_path.exists():
         build_sample_corpus()
 

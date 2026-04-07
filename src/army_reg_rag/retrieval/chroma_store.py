@@ -7,18 +7,41 @@ import re
 from pathlib import Path
 from typing import Iterable
 
-try:
-    import chromadb
-except Exception:  # pragma: no cover - optional dependency fallback
-    chromadb = None
-
-try:
-    from sentence_transformers import SentenceTransformer
-except Exception:  # pragma: no cover - optional dependency fallback
-    SentenceTransformer = None
-
 from army_reg_rag.config import Settings
 from army_reg_rag.domain.models import DocumentChunk, SearchHit
+
+_chromadb_module = None
+_chromadb_import_attempted = False
+_sentence_transformer_cls = None
+_sentence_transformer_import_attempted = False
+
+
+def _get_chromadb():
+    global _chromadb_module, _chromadb_import_attempted
+    if _chromadb_import_attempted:
+        return _chromadb_module
+    _chromadb_import_attempted = True
+    try:
+        import chromadb as _chromadb
+    except Exception:
+        _chromadb_module = None
+    else:
+        _chromadb_module = _chromadb
+    return _chromadb_module
+
+
+def _get_sentence_transformer_class():
+    global _sentence_transformer_cls, _sentence_transformer_import_attempted
+    if _sentence_transformer_import_attempted:
+        return _sentence_transformer_cls
+    _sentence_transformer_import_attempted = True
+    try:
+        from sentence_transformers import SentenceTransformer as _SentenceTransformer
+    except Exception:
+        _sentence_transformer_cls = None
+    else:
+        _sentence_transformer_cls = _SentenceTransformer
+    return _sentence_transformer_cls
 
 
 class HybridTextEmbedder:
@@ -32,10 +55,11 @@ class HybridTextEmbedder:
         if self._model is not None or self._model_load_attempted:
             return self._model
         self._model_load_attempted = True
-        if SentenceTransformer is None:
+        sentence_transformer_cls = _get_sentence_transformer_class()
+        if sentence_transformer_cls is None:
             return None
         try:
-            self._model = SentenceTransformer(self.model_name)
+            self._model = sentence_transformer_cls(self.model_name)
         except Exception:
             self._model = None
         return self._model
@@ -132,10 +156,11 @@ class ChromaStore:
             model_name=settings.embedding.model_name,
             fallback_dim=settings.embedding.fallback_dim,
         )
-        self._backend = "chroma" if chromadb is not None else "json_fallback"
+        chromadb_module = _get_chromadb()
+        self._backend = "chroma" if chromadb_module is not None else "json_fallback"
 
-        if chromadb is not None:
-            self.client = chromadb.PersistentClient(path=str(settings.chroma_path))
+        if chromadb_module is not None:
+            self.client = chromadb_module.PersistentClient(path=str(settings.chroma_path))
             self.collection = self.client.get_or_create_collection(
                 name=settings.app.collection_name,
                 metadata={"hnsw:space": "cosine"},
