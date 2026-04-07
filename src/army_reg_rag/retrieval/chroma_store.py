@@ -26,11 +26,19 @@ class HybridTextEmbedder:
         self.model_name = model_name
         self.fallback_dim = fallback_dim
         self._model = None
-        if SentenceTransformer is not None:
-            try:
-                self._model = SentenceTransformer(model_name)
-            except Exception:
-                self._model = None
+        self._model_load_attempted = False
+
+    def _ensure_model(self):
+        if self._model is not None or self._model_load_attempted:
+            return self._model
+        self._model_load_attempted = True
+        if SentenceTransformer is None:
+            return None
+        try:
+            self._model = SentenceTransformer(self.model_name)
+        except Exception:
+            self._model = None
+        return self._model
 
     def _tokenize(self, text: str) -> list[str]:
         return re.findall(r"[\w가-힣]+", text.lower())
@@ -49,8 +57,9 @@ class HybridTextEmbedder:
         return [v / norm for v in vec]
 
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        if self._model is not None:
-            vectors = self._model.encode(texts, normalize_embeddings=True)
+        model = self._ensure_model()
+        if model is not None:
+            vectors = model.encode(texts, normalize_embeddings=True)
             return [vector.tolist() for vector in vectors]
         return [self._fallback_embed(text) for text in texts]
 

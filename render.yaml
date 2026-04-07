@@ -5,7 +5,7 @@ services:
     plan: free
     region: singapore
     autoDeployTrigger: checksPass
-    healthCheckPath: /
+    healthCheckPath: /_stcore/health
     envVars:
       - key: GEMINI_API_KEY
         sync: false
@@ -22,9 +22,9 @@ services:
       - key: APP_ALLOW_DEBUG_TAB
         value: "false"
       - key: APP_CHROMA_PATH
-        value: /tmp/chroma
+        value: /app/data/chroma
       - key: APP_RUNTIME_DIR
-        value: /tmp/runtime
+        value: /app/data/runtime
       - key: APP_DEFAULT_LAW_FILTER
         value: 전체
       - key: CHROMA_COLLECTION_NAME
