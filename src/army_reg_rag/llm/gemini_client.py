@@ -18,6 +18,7 @@ except Exception:  # pragma: no cover
     types = None
 
 QUOTA_BLOCK_MESSAGE = "한도 소진(추가 답변이 제한)"
+PROVIDER_RATE_LIMIT_NOTICE = "Gemini API ???? ?? ??? ??? ?? ?? ?? ??? ??????."
 
 NOISY_TOKENS = [
     "데모용 요약:",
@@ -458,7 +459,13 @@ class GeminiAnswerClient:
 
         snapshot = self.usage_tracker.snapshot()
         if not snapshot["can_generate"]:
-            return self._quota_block_result(snapshot)
+            return self._fallback_result(
+                question=question,
+                intent=intent,
+                evidence=evidence,
+                notice=QUOTA_BLOCK_MESSAGE,
+                quota_snapshot=snapshot,
+            )
 
         if self._client is None or types is None:
             return self._fallback_result(
@@ -512,8 +519,13 @@ class GeminiAnswerClient:
         except Exception as exc:
             message = str(exc)
             if getattr(exc, "status_code", None) == 429 or "RESOURCE_EXHAUSTED" in message or "Quota exceeded" in message:
-                updated_snapshot = self.usage_tracker.block_for_today(QUOTA_BLOCK_MESSAGE)
-                return self._quota_block_result(updated_snapshot)
+                return self._fallback_result(
+                    question=question,
+                    intent=intent,
+                    evidence=evidence,
+                    notice=PROVIDER_RATE_LIMIT_NOTICE,
+                    quota_snapshot=self.usage_tracker.snapshot(),
+                )
             return self._fallback_result(
                 question=question,
                 intent=intent,

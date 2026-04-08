@@ -391,9 +391,6 @@ def validate_question(question: str, max_chars: int) -> str | None:
         return "질문을 입력해 주세요."
     if len(stripped) > max_chars:
         return f"질문은 최대 {max_chars}자까지 입력할 수 있습니다."
-    snapshot = global_quota_snapshot()
-    if not snapshot.get("can_generate", False):
-        return QUOTA_BLOCK_MESSAGE
     return None
 
 
@@ -520,6 +517,8 @@ def render_chat_history(preview_chars: int, all_source_types: list[str], allow_d
         with st.chat_message("assistant"):
             st.caption("실무 참고용, 법률자문 아님")
             st.markdown(message["answer_markdown"])
+            if message.get("answer_notice"):
+                st.info(message["answer_notice"])
             if message.get("evidence"):
                 st.markdown("<div class='evidence-block-title'>근거(하단 원문 링크 참고)</div>", unsafe_allow_html=True)
                 if message.get("answer_backend"):
