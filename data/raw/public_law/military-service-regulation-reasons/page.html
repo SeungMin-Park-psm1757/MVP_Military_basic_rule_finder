@@ -1,0 +1,988 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+ <head> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />    
+  <!-- 레이아웃 관련 CSS -->      
+  <!-- 레이아웃 관련 CSS //--> 
+  <script type="text/javascript" src="/LSW/js/jquery/jquery.min.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/common/common.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/common/drag_search.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/common/CookieUtil.js"></script> 
+  <script type="text/javascript" src="/LSW/js/jquery/jquery.loadmask.min.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/common/jquery-custom.js?Time=1775665857"></script> 
+  <!-- 레이아웃 관련 JS --> 
+  <script type="text/javascript" src="/LSW/js/jquery/jquery-ui.min.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/jquery/jquery-ui_2017.min.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/jquery/jquery.layout-latest.min.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/common/layout.js?Time=1775665857"></script> 
+  <!-- 레이아웃 관련 JS //-->  
+  <script type="text/javascript">
+        var webRoot = '/LSW';
+    </script> 
+  <link rel="shortcut icon" type="text/css" href="/LSW/images/ico_favorites.ico" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/common.css?Time=1775665857" />
+  <link rel="stylesheet" type="text/css" href="/LSW/js/jquery/jquery.loadmask.css?Time=1775665857" />
+  <link rel="stylesheet" type="text/css" href="/LSW/js/jquery/layout-default-latest.css?Time=1775665857" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/layout.css?Time=1775665857" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/board.css?Time=1775665857" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/ui_2017.css?Time=1775665857" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/fonts.css?Time=1775665857" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/common-ex.css" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/xtheme-ls.css" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/xtheme-lsHst.css" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/xtheme-layer.css" />
+  <link rel="stylesheet" type="text/css" href="/LSW/css/lsw/xtheme-lsOutput.css" />
+  <style type="text/css">
+        .ui-layout-pane {
+            padding: 0;
+            background:	#EEE;
+        }
+        .ui-layout-west {
+            background:	#CFC;
+        }
+        .ui-layout-center {
+            background:	#FFC;
+            padding:	0; /* IMPORTANT - remove padding so pane can 'collapse' to 0-width */
+        }
+
+        .ui-layout-west > .ui-layout-center {
+            background:	#CFC;
+        }
+
+        .ui-layout-west > .ui-layout-south {
+            background:	#AFE;
+        }
+        .ui-layout-pane { border-width: 0; }
+        .ui-layout-north { border-bottom-width:	1px; }
+        .ui-layout-south { border-top-width: 1px; }
+        .ui-layout-resizer-west {
+            border-width: 0;
+            border-left: 2px solid #b4b4b4;
+            background-color:white;
+        }
+        .ui-layout-toggler {
+            border: 0;
+            background-color:#fff
+        }
+        .ui-layout-toggler-west-closed {
+            background-image: url("./images/button/leslidev7_2.gif");
+            background-color:white;
+            background-repeat: no-repeat;
+        }
+        .ui-layout-toggler-west-open {
+            background-image: url("./images/button/leslidev7_1.gif");
+            background-color:white;
+            background-repeat: no-repeat;
+        }
+    </style> 
+  <style type="text/css">
+
+html{overflow:hidden;}
+</style>
+  <title>국가법령정보센터|전체 제정·개정이유</title>
+ </head> 
+ <body class="popbg2" id="bodyId">          
+  <script type="text/javascript" src="/LSW/js/jquery/jquery.form.js"></script> 
+  <script type="text/javascript" src="/LSW/js/ls/ls.js"></script> 
+  <script type="text/javascript" src="/LSW/js/ls/fUpdate.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/ls/lsJo.js"></script> 
+  <script type="text/javascript" src="/LSW/js/common/xmlHttpUtil.js"></script> 
+  <script type="text/javascript" src="/LSW/js/common/common-ex.js"></script> 
+  <script type="text/javascript" src="/LSW/js/ls/lsPopLayer.js"></script> 
+  <script type="text/javascript" src="/LSW/js/ls/lsLink.js?Time=1775665857"></script> 
+  <script type="text/javascript" src="/LSW/js/common/commPop.js"></script> 
+  <script type="text/javascript" src="/LSW/js/ls/lsOutPutJoNew.js"></script> 
+  <script type="text/javascript" src="/LSW/js/common/autocom.js"></script> 
+  <script type="text/javascript" src="/LSW/js/ls/lsMakeJo.js"></script>
+  <!--누락된 js추가 --> 
+  <script type="text/javascript" src="/LSW/js/common/diff_match_patch.js"></script> 
+  <script type="text/javascript">
+
+var lsiVO = {};
+
+function bdySavePrint(mode,obj,xValue) {
+	var bdyContentNm = "";
+    var contentNm = "제정·개정이유";
+
+	if (mode == 0) {
+		
+		var goUrl = "";
+		lsiVO.lsId = el('lsId').value;
+		LsRvsRsnContentSave("lsRvsRsnDocInfoR.do", obj, lsiVO);
+		
+		return true;
+	} else {
+		openScrollPop(webRoot + "/lsSideInfoPrint.do?contentNm=" + encodeURIComponent(contentNm));
+	}
+}
+
+var lsVO = new LsValueObj();
+window.onload =  function() {
+    lsVO.updateValue.updateDiv = "viewwrapCenter";
+    $('#viewwrapCenter').css('overflow-x', 'hidden');
+    $('#viewwrapCenter').css('overflow', 'auto');
+    $("#viewwrapCenter").height( $("#viewwrapCenter").height() - ($("#bodyId").height()- $("#viewwrapCenter").height()) + 32 );    
+}
+
+</script>    
+  <input type="hidden" id="lsId" value="003019" /> 
+  <input type="hidden" id="lsiSeqs" value="0" /> 
+  <!-- head --> 
+  <noscript>
+   <p>자바스크립트를 지원하지 않아 일부 기능을 사용할 수 없습니다.</p>
+  </noscript> 
+  <div class="pophead" onclick="window.open('main.html');" onmouseover="this.style.cursor='pointer';"> 
+   <h2> 전체 제정·개정이유 </h2> 
+   <p> <img src="/LSW/images/common/poplogo.gif" alt="법제처 국가법령정보센터" /> </p> 
+  </div> 
+  <!-- head //--> 
+  <!-- 본문 선택 영역 --> 
+  <div class="confnla4"> 
+   <div class="rig1"> 
+    <div class="fnall1" style="float:left;"> 
+     <a href="javascript:;" id="innerSearch" class="btn type4" onclick="lsBodySearch2(this);return false;">화면내검색</a> 
+    </div> 
+    <div class="fnall"> 
+     <a href="javascript:;" title="저장" id="bdySaveBtn" onclick="javascript:bdySavePrint(0, this ,0);"> <img src="/LSW/images/common/btn_v13fn6.gif" alt="저장" /> </a> 
+     <a href="javascript:;" title="인쇄" id="bdyPrintBtn" onclick="javascript:bdySavePrint(1, this ,20);"> <img src="/LSW/images/common/btn_v13fn7.gif" alt="인쇄" /> </a> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- 본문 --> 
+  <div id="viewwrapCenter" class="viewwrap"> 
+   <div class="confnla1"> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2016. 6. 30.] [대통령령 제27263호, 2016. 6. 28., 타법폐지] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[제정]<br />◇ 제정이유<br />  군대 내 기본권 침해가 근절되지 못하고 있어 군의 사기와 군에 대한 국민의 신뢰가 저하됨에 따라 주기적인 기본권 교육을 통하여 군인의 기본권 의식을 함양하고, 군인의 기본권 보장에 관한 사항, 군인의 의무에 관한 사항 및 기본정책의 수립에 관한 사항 등을 심의하기 위하여 국방부장관 소속으로 군인복무정책심의위원회를 설치하도록 하는 등의 내용으로 「군인의 지위 및 복무에 관한 기본법」이 제정(법률 제13631호,  2015. 12. 29. 공포, 2016. 6. 30. 시행)됨에 따라, 군인복무정책심의위원회의 운영 및 군인의 연가ㆍ공가ㆍ청원휴가ㆍ특별휴가ㆍ정기휴가 등의 세부적 기준을 정하는 등 법률에서 위임된 사항과 그 시행을 위하여 필요한 사항을 정하려는 것임.<br /><br />◇ 주요내용<br />  가. 군인의 기본정신(제2조)<br />    군 본연의 자세를 표상(表象)하는 군기, 사기, 단결 및 교육훈련 등 군인의 기본정신을 마련함.<br /><br />  나. 군인복무기본정책 및 시행계획의 수립시기 등(제3조 및 제4조)<br />    1) 군인복무기본정책은 국가정책, 안보환경ㆍ국방정책 및 복무제도ㆍ복무환경 등을 고려하여 그 시행 전년도 12월 31일까지 수립하도록 함.<br />    2) 시행계획은 군 구조ㆍ병력전망, 병역ㆍ복무제도 및 병영문화 개선추진 상황 등을 고려하여 매년 12월 31일까지 수립하도록 함.<br /><br />  다. 군인복무정책심의위원회의 운영(제5조)<br />    군인의 기본권 보장에 관한 사항, 군인의 의무에 관한 사항 및 기본정책의 수립에 관한 사항 등을 심의하기 위하여 국방부장관 소속으로 군인복무정책심의위원회가 설치됨에 따라, 위원회의 위원장이 위원회를 대표하고, 위원회의 업무를 총괄하며, 위원장이 위원회를 소집하려면 회의의 일시ㆍ장소 및 심의 안건을 정하여 회의 개최일 7일 전까지 위원들에게 서면으로 알리도록 하는 등 위원회의 운영 등에 필요한 세부사항을 정함.<br /><br />  라. 영내대기의 세부절차 마련(제8조)<br />    1) 국가비상사태, 경계태세 또는 천재지변이나 그 밖의 재난 등이 발생하여 군인이 영내대기를 하는 경우 그 명령권자는 중령 이상 지휘관으로 함.<br />    2) 영내대기를 명하려는 지휘관은 영내대기 사유, 개시시점 등을 사전에 알리도록 하고, 영내대기를 하고 있는 군인이 영내대기 장소를 이탈하려는 경우에는 지휘관의 승인을 받도록 함.<br /><br />  마. 군인의 연가, 공가, 청원휴가, 특별휴가 및 정기휴가 등의 세부적 기준 마련(제9조부터 제16조까지)<br />    1) 하사 이상 군인의 연가일수는 연 21일 이내로 함.<br />    2) 군인은 국가기관에 공무가 있는 경우, 법률의 규정에 따라 투표에 참여하는 경우 및 공무상 질병이나 부상으로 직무를 수행할 수 없는 경우 등에는 일정기간 동안 공가를 실시하도록 함.<br />    3) 본인이 부상 또는 질병으로 요양이 필요하거나 그 직계가족의 부상 또는 질병으로 본인이 간호를 하여야 하는 경우 및 본인이 「성폭력방지 및 피해자보호 등에 관한 법률」에 따른 성폭력피해자로서 치료가 필요한 군인에 대하여는 일정한 기간 내에 청원휴가를 실시할 수 있도록 함.<br />    4) 훈련ㆍ검열 그 밖에 특별한 근무로 피로가 심한 군인 등에 대하여는 위로휴가를, 모범이 되는 공적이 있는 군인에 대하여는 포상휴가를, 명예전역 또는 정년전역하려는 군인에 대하여는 전역 전 휴가를, 풍해ㆍ화재 등 재해로 인하여 피해를 입은 군인에 대하여는 재해구호휴가 등 특별휴가를 실시할 수 있도록 함.<br />    5) 병(兵)의 정기휴가는 「병역법」에 따른 각 군별 복무기간에 따라 차등하여 실시하도록 함.<br /><br />  바. 영리 업무의 금지에 관한 세부적인 기준 마련 등(제19조)<br />    군인은 상업, 공업, 금융업 또는 그 밖의 영리적인 업무를 스스로 경영하여 영리를 추구함이 뚜렷한 업무에 종사하거나 본인의 직무와 관련이 있는 타인의 기업에 투자함으로써 군무(軍務)에 대하여 부당한 영향을 끼치거나, 군에 대한 불명예스러운 영향을 끼칠 우려가 있는 경우 등에는 그 업무에 종사할 수 없도록 함.<br /><br />  사. 군인고충심사위원회의 구성 및 운영 등에 관한 사항 마련(제25조부터 제30조까지)<br />    1) 군인고충심사위원회의 위원은 위원장 1명을 포함하여 5명 이상 7명 이하의 위원으로 구성하고, 위원장은 위원 중 가장 선임인 사람으로 함.<br />    2) 군인고충심사위원회가 군인의 고충심사 청구서를 접수한 경우에는 30일 이내에 고충심사를 결정하도록 하고, 부득이하다고 인정되는 경우에는 군인고충심사위원회 설치기관의 장의 승인을 받아 30일의 범위에서 연장할 수 있도록 함.<br />    3) 군인고충심사위원회의 결정에 불복하는 청구인은 그 심사결과를 통보받은 날부터 30일 이내에 장교ㆍ준사관ㆍ부사관의 경우에는 중앙 군인사소청심사위원회에, 병의 경우에는 차상급 장관급 장교가 지휘하는 부대에 설치된 군인고충심사위원회에 재심을 청구할 수 있도록 함.<br /><br />  아. 병영생활 전문상담관 및 성고충 전문상담관의 자격기준 및 채용절차 등 마련(제31조부터 제36조까지)<br />    병영생활 전문상담관 및 성고충 전문상담관의 자격기준을 심리상담 또는 사회복지분야 관련 자격증을 소지한 사람으로서 5년 이상 상담경험이 있는 사람 등으로 정하고, 전문상담관은 서류전형과 면접시험을 거쳐 선발하도록 함.<br />&lt;법제처 제공&gt;<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2015. 7. 13.] [대통령령 제26394호, 2015. 7. 13., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇ 개정이유 및 주요내용<br />  군인이 복무와 관련된 고충사항에 대하여 진정 등의 방법으로 군외부에 그 해결을 요청하지 못하도록 하던 것을, 앞으로는「국가인권위원회법」 등에 따라 국가인권위원회 등에 그 해결을 요청할 수 있도록 규정함으로써, 군인의 고충사항 해결 방법을 보다 명확하게 하려는 것임.<br />&lt;법제처 제공&gt;<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2014. 10. 28.] [대통령령 제25673호, 2014. 10. 28., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇ 개정이유 및 주요내용<br />  한 번에 두 명 이상의 자녀를 임신한 여성 군인은 동시 출산, 난산 및 높은 조산율 등으로 인하여 산후 회복에 더 많은 시간이 필요하고 육아부담 또한 일반 산모보다 큰 사정을 고려하여 출산휴가 기간을 현행 90일에서 120일로 확대하고, <br />  현재 출산휴가는 출산일 전후를 통하여 사용하도록 하기 때문에 임신초기 필요한 때에 출산휴가를 사용할 수 없게 되는 문제를 해결하기 위하여, 임신 중인 여성 군인이 유산ㆍ사산 경험이 있거나 연령이 만 40세 이상인 경우 등에는 출산 전 어느 때라도 최장 44일(한 번에 두 명 이상의 자녀를 임신한 경우에는 59일)의 범위에서 출산휴가를 나누어 사용할 수 있도록 하는 등 현행 제도의 운영상 나타난 일부 미비점을 개선ㆍ보완하려는 것임.<br />&lt;법제처 제공&gt;<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2012. 9. 1.] [대통령령 제24077호, 2012. 8. 31., 타법개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">⊙대통령령 제24077호(2012.8.31)<br />국민건강보험법 시행령 전부개정령<br /><br />[전부개정]<br />◇ 개정이유<br />  직장가입자에 대하여 보수를 기준으로 산정하는 보수월액보험료 외에 다른 소득을 기준으로 산정하는 소득월액보험료를 징수하도록 하고, 납부능력이 있음에도 보험료를 체납하고 있는 자의 명단을 공개할 수 있도록 하는 등의 내용으로 「국민건강보험법」이 전부개정(법률 제11141호, 2011. 12. 31. 공포, 2012. 9. 1. 시행)됨에 따라 직장가입자의 소득월액보험료의 산정기준과 보험료 체납자의 인적사항 공개에 관한 사항을 정하는 등 법률에서 위임된 사항과 그 시행에 필요한 사항을 정하는 한편, 재외국민 및 외국인 피부양자의 요건을 명확하게 규정하는 등 현행 제도의 운영상 나타난 일부 미비점을 개선·보완하려는 것임. <br /><br />◇ 주요내용<br />  가. 소득월액 산정 방법 등 구체화(안 제41조)<br />    1) 법률에서 직장가입자의 보수 외 소득을 기준으로 소득월액보험료를 부과·징수할 수 있도록 함에 따라 이 영에서 그 내용을 구체화할 필요가 있음.<br />    2) 소득월액보험료는 이자소득, 배당소득, 사업소득, 근로소득, 연금소득 및 기타소득을 합한 금액이 연간 7,200만원을 넘는 경우에 해당 금액을 12로 나누어 산정하고, 그 금액이 7,810만원을 넘는 경우에는 7,810만원으로 함.<br /><br />  나. 보험료 체납자의 인적사항 공개 절차 등(안 제48조 및 제49조)<br />    1) 법률에서 납부능력이 있는 보험료 체납자의 인적사항 등을 공개할 수 있도록 함에 따라 이 영에서 명단공개에 관한 구체적인 사항을 정할 필요가 있음.<br />    2) 공개대상자를 선정할 때에는 체납자의 재산상태, 소득수준, 미성년자 여부, 그 밖의 사정을 종합적으로 고려하여 납부능력이 있는지를 판단하도록 하고, 공개 여부를 심의하기 위한 보험료정보공개심의위원회는 위원장 1명을 포함한 11명의 위원으로 구성하도록 함.<br /><br />  다. 재외국민 및 외국인 피부양자의 요건(안 제76조제3항)<br />    1) 법률상 근거에 따라 재외국민 및 외국인에 대해서도 피부양자 제도를 운영하고 있으나, 피부양자가 될 수 있는 요건이 명확하게 규정되지 않은 실정임.<br />    2) 국내거소신고를 하거나 외국인등록을 한 재외국민·외국인이 직장가입자에게 주로 생계를 의존하면서 보수 또는 소득이 없는 것으로 인정되면 피부양자가 될 수 있도록 함.<br />    3) 재외국민 및 외국인의 피부양자의 요건을 명확하게 규정함으로써 안정적인 제도 운영에 이바지할 것으로 기대됨.<br />&lt;법제처 제공&gt;<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2012. 8. 5.] [대통령령 제24017호, 2012. 8. 3., 타법개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">⊙대통령령 제24017호(2012.8.3)<br />입양촉진 및 절차에 관한 특례법 시행령 전부개정령<br /><br />[전부개정]<br />◇ 개정이유<br />  아동입양의 복리를 위하여 아동학대 등 범죄경력이 있는 사람은 양친이 될 수 없게 하는 등 양친의 요건을 강화하고, 입양된 아동이 입양된 가정에 적응할 수 있도록 입양기관이 사후서비스를 제공하도록 하며, 양자가 된 사람이 자신과 관련된 입양정보의 공개를 청구할 수 있도록 하는 등의 내용으로 「입양촉진 및 절차에 관한 특례법」이 개정(법률 제11007호, 2011. 8. 4. 공포, 2012. 8. 5. 시행)됨에 따라 양친이 될 사람의 범죄경력 조회절차를 정하고, 입양기관이 제공하는 사후서비스의 내용을 구체화하며, 입양정보 공개제도의 절차 및 방법을 정하는 등 법률에서 위임된 사항과 그 시행에 필요한 사항을 정하는 한편, 장애아동 등 양육보조금 지급의 실효성을 높이기 위하여 지급 대상 및 절차를 구체화하는 등 현행 제도의 운영상 나타난 일부 미비점을 개선·보완하려는 것임.<br /><br />◇ 주요내용<br />  가. 양친이 될 사람의 범죄경력 조회절차(안 제2조제2항)<br />    1) 법률 개정으로 아동학대·가정폭력·성폭력·마약 등의 범죄경력이 있는 사람은 양친이 될 수 없도록 요건이 강화됨에 따라, 양친이 될 사람의 요건을 조사·확인하는 절차를 정할 필요가 있음.<br />    2) 입양기관의 장 등 조사기관은 양친될 사람의 동의서를 첨부하여 양친이 될 사람이 범죄경력이 있는지 확인하여 줄 것을 경찰관서의 장에게 문서로 요청할 수 있도록 함.<br /><br />  나. 국외로 입양된 아동을 위한 사후서비스의 내용(안 제5조)<br />    1) 법률 개정으로 입양기관의 장은 국외로 입양된 아동을 위하여 모국방문사업 등 사후서비스를 제공하도록 하고, 그 일부를 이 영에서 정하도록 위임함에 따라 사후서비스의 내용을 구체화할 필요가 있음.<br />    2) 사후서비스에는 모국방문사업, 모국어 연수 지원, 모국에 관한 자료 제공, 친생부모 찾기 사업, 국적 회복 지원 등이 포함되도록 함.<br /><br />  다. 장애아동 등 양육보조금 등 지급대상 및 절차 구체화(안 제7조부터 제10조까지)<br />    1) 종전에는 양육보조금 등 지급대상에 입양 후 선천적 장애가 발견된 장애아동의 포함 여부나 양육보조금 등 지급 신청에 대한 결정·통지 및 지급 절차가 명확하지 않은 측면이 있었음.<br />    2) 양육보조금 등 지급 대상에 입양 후 선천적 장애가 발견된 장애아동을 포함시키고, 양육보조금 지급결정의 통지는 특별한 사정이 없으면 신청한 날부터 15일 이내에 하도록 하며, 통지한 날이 속한 달부터 양육보조금을 지급하도록 함.<br />    3) 양육보조금 지급대상 및 절차를 수요자 중심으로 정비함으로써 입양아동 지원의 실효성이 높아질 것으로 기대됨.<br /><br />  라. 입양정보 공개제도의 절차 등(안 제13조부터 제17조까지)<br />    1) 법률 개정으로 양자가 된 사람이 중앙입양원 또는 입양기관에 자신과 관련된 입양정보의 공개를 청구할 수 있도록 함에 따라 공개 청구의 절차·방법 등을 정할 필요가 있음.<br />    2) 양자가 된 사람은 친생부모의 인적사항, 입양 배경에 관한 사항, 입양된 사람 및 입양시설에 관한 정보의 공개를 서면 또는 말로 청구하도록 하고, 청구를 받은 기관은 관계 기관의 협조를 받아 친생부모의 동의 여부를 확인한 후 청구일부터 15일 이내에 공개 여부를 결정하도록 하며, 공개의 방법은 문서의 열람 또는 사본 제공, 복제한 파일을 저장한 매체 제공 또는 전자우편 송부 등으로 정함.<br />&lt;법제처 제공&gt;<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2012. 2. 22.] [대통령령 제23625호, 2012. 2. 22., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇ 개정이유<br />  다문화가족 증가 등 시대적 흐름에 맞게 입영 및 임관선서문의 내용을 개정하고, 저출산·고령화 사회에 능동적으로 대응하는 동시에 일과 가정의 양립을 지원하기 위하여 현실에 맞게 군인 휴가 제도를 개선하는 한편, 그 밖에 현행 제도의 운영상 나타난 일부 미비점을 개선·보완하려는 것임.<br />◇ 주요내용<br />  가. 입영 및 임관선서문 개정(안 제5조)<br />    1) 현재 입영 및 임관선서문에서 충성의 대상으로 명시하고 있는 ‘민족’이라는 용어는 최근 증가하고 있는 다문화가족 등 변화된 현실에 맞지 않아 개정할 필요가 있음.<br />    2) 군인이 입영 또는 임관 시 선서하는 충성의 대상을 시대적 흐름에 맞게 ‘민족’에서 ‘국민’으로 개정함.<br />  나. 휴가일수 및 연가일수 산정 합리화(안 제39조제3항 및 제39조의2제5항제2호)<br />    1) 현재 공휴일과 달리 토요일은 휴가일수에 산입하고 있고, 연가일수 계산 시 정직 등으로 실제 직무에 종사하지 않은 기간을 고려하고 있지 않아 합리적으로 조정할 필요가 있음.<br />    2) 휴가기간 중의 토요일도 공휴일과 마찬가지로 휴가일수에 산입하지 않도록 하고, 연가일수 산식에서 공무상 질병 또는 부상으로 인한 휴직기간을 제외한 휴직기간, 정직기간, 직위해제기간 및 강등처분에 따라 직무에 종사하지 못하는 기간은 실제로 복무한 개월 수에 포함하지 않도록 함.<br />  다. 공가(公暇) 및 청원휴가의 사유와 휴가기간의 조정(안 제39조의3제7호 신설 및 안 제39조의4제1항)<br />    1) 군인과 다른 경력직공무원 사이의 복무운영상 형평을 유지하고 군인의 사기를 높이기 위하여 공가 및 청원휴가의 사유 및 휴가기간을 조정할 필요가 있음.<br />    2) 공가 사유에 본인의 건강검진을 추가하고, 본인의 혼인(7일 → 5일), 배우자의 출산(3일 → 최대 9일), 입양(14일 → 20일) 등 일부 청원휴가 일수를 조정하며, 자녀의 혼인(1일)과 본인 및 배우자의 형제자매의 사망(1일)에 대한 청원휴가를 신설함.<br />  라. 유산 또는 사산 휴가제도 등 보완(안 제39조의4제3항제1호·제2호 및 같은 조 제6항 신설)<br />    1) 군인의 경우 다른 경력직공무원과 달리 임신 16주 이후에 유산하거나 사산한 경우에만 청원휴가를 부여하고, 불임치료 시술을 지원하기 위한 청원휴가가 없어 출산율 향상을 위해 관련 제도를 다른 경력직공무원과 같은 수준으로 개선할 필요가 있음.<br />    2) 군인이 임신 16주 전에 유산하거나 사산한 경우에도 임신기간에 따라 최대 10일까지 청원휴가를 부여하고, 불임치료 시술을 지원하기 위하여 시술 당일에 1일의 청원휴가를 받을 수 있도록 함.<br />&lt;법제처 제공&gt;<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2009. 9. 29.] [대통령령 제21750호, 2009. 9. 29., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇개정이유 및 주요내용<br />  군 지휘체계상 상관의 개념을 명확히 하고, 정보통신망을 이용하는 등의 경우에 타인의 명예를 손상하지 않도록 하기 위하여 명예존중의 의무를 규정하며, 직무를 수행함에 있어서 상관과 부하 간에 상호 존경과 존중을 하도록 하는 한편, 그 밖에 현행 제도의 운영상 나타난 일부 미비점을 개선·보완하려는 것임.<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2007. 9. 20.] [대통령령 제20282호, 2007. 9. 20., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇개정이유<br />  여성공무원의 출산휴가제도를 보완하고 입양휴가제를 신설하는 내용으로 「국가공무원 복무규정」이 개정(대통령령 제19722호, 2006. 11. 1. 공포·시행)됨에 따라 군인과 공무원 사이의 복무운영상 형평을 유지하고 군인의 사기를 높이기 위하여 관련 제도들을 정비·신설하는 한편, 연가일수 산출 방식을 신설하는 등 현행 제도의 운영상 나타난 일부 미비점을 개선·보완하려는 것임.<br />◇주요내용<br />  가. 연가일수 및 산출방법 조정(영 제39조의2 신설)<br />    국가공무원과 균형을 이룰 수 있도록 군인의 연가일수를 21일로 축소·조정하고, 휴직 등으로 실제 복무하지 아니한 기간을 연가일수 산출에서 제외하며, 연가 일수 산출 방식을 신설하는 등 연가제도의 시행을 위하여 필요한 사항을 정비함.<br />  나. 공가(公暇) 및 청원휴가의 사유와 휴가기간의 조정(영 제39조의3 및 제39조의4제1항 신설)<br />    국가공무원의 공가사유와 균형을 맞추기 위하여 군인이 올림픽·전국체전 등 국가적인 행사에 참여하는 경우, 천재·지변 등으로 출근이 불가능한 경우 등을 공가사유로 추가하고, 혼인·배우자의 사망 등으로 인한 청원휴가의 기간을 축소·조정함.<br />  다. 여성 군인의 출산휴가제도 등 보완(영 제39조의4제2항, 제3항 및 같은 조 제5항 신설)<br />    (1) 여성 군인의 경우 출산휴가 기간이 60일로 규정되어 있어 국가공무원의 경우보다 짧고, 임신 중 유산하거나 사산한 경우 국가공무원과 다르게 휴가를 주는 규정이 없어 국가공무원 수준으로 개선할 필요성이 있음.<br />    (2) 여성 군인에게 산전(産前)과 산후(産後)를 통하여 종전보다 30일이 늘어난 90일의 출산휴가를 주되 산후에 45일이 배정되도록 하고, 앞으로는 임신 16주 이후에 유산하거나 사산한 경우 임신 기간에 따라 차이를 두어 유산·사산 휴가를 주도록 하며, 유아를 가진 여성 군인에 대하여 일정 시간을 육아시간으로 사용할 수 있도록 개선함.<br />    (3) 공무원 및 민간 근로자의 출산휴가 규정에 상응하도록 관련 규정을 개선·정비함으로써 여성 군인의 출산 장려, 임산부의 건강보호 및 육아시간 확보에 이바지할 것으로 기대됨.<br />  라. 보상휴가제 신설(영 제39조의5제4항 신설)<br />    (1) 전방의 경계업무 등으로 1주일에 40시간을 초과하여 근무하는 국방부장관이 정하는 범위의 군인에 대하여 앞으로는 한 달에 3일 이내의 휴가를 허가할 수 있도록 함.<br />    (2) 업무의 특성상 규칙적으로 휴식을 취할 수 없는 군인에 대하여 보상휴가를 실시함으로써 근무의욕을 높이고, 주 40시간 근무를 하는 군인과 비교하여 근무시간에 형평을 유지하게 될 것으로 기대됨.<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 2001. 3. 27.] [대통령령 제17158호, 2001. 3. 27., 타법개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">⊙대통령령 제17158호(2001.3.27)<br />군인사법시행령중개정령<br /><br />[일부개정]<br />◇개정이유 및 주요골자<br />  군인사법이 개정(2000. 12. 26, 법률 제6290호)됨에 따라 하사관의 명칭을 부사관으로 변경하는 등 관련 규정을 정비하려는 것임.<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 1998. 12. 31.] [대통령령 제15954호, 1998. 12. 31., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇개정이유<br />  군인의 복무자세를 재정립하기 위하여 국민에 대한 친절의 의무 등을 신설하고, 명랑한 병영생활을 보장하기 위하여 군인의 고충처리 및 휴가제도 등을 개선하며, 기타 현행 제도의 운영상 나타난 일부 미비점을 개선·보완하려는 것임.<br />◇주요골자<br />  가. 군인의 의무에 국민에 대한 친절의 의무, 전쟁법 준수의 의무 및 환경보전의 의무를 각각 신설함(령 제7조의2·제10조의2 및 제11조의2 신설).<br />  나. 불온사상이 군에 침투하는 것을 방지하기 위하여 군인의 불온표현물 소지·전파 등을 금지하고, 이를 취득한 때에는 즉시 신고하도록 함(령 제16조의2 신설).<br />  다. 초병은 지휘계통상의 상관의 명령이나 지시없이는 휴대하고 있는 무기나 탄약을 타인에게 넘겨주지 못하도록 함(령 제34조제2항 신설).<br />  라.재해구호휴가제도를 신설하여 휴가의 허가권자는 재해시 군인에게 5일이내의 재해구호휴가를 줄 수 있도록 함(령 제39조제1항제8호 신설).<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 1996. 3. 16.] [대통령령 제14951호, 1996. 3. 16., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇개정이유<br />  군인의 사기진작과 복무분위기 조성을 위하여 공무원복무규정의 개정(1995.12.14, 大統領令 第14825號)내용에 맞추어 군인의 년가일수를 조정하고 장기근속군인에 대한 장기근속휴가제도를 신설하며, 기타 현행 규정의 운영상 나타난 일부 미비점을 개선·보완하려는 것임.<br />◇주요골자<br />  가. 종전에는 군인중 병의 경우 연가일수를 일률적으로 년 25일로 하던 것을 앞으로는 년 25일의 범위내에서 병의 복무기간 및 근무지에 따라 융통성 있게 연가를 실시할 수 있도록 하고, 장기복무하사관 및 장교의 연가일수를 종전의 20일에서 23일로 조정하여 경로목적의 효친휴가를 실시할 수 있도록 함(令 第39條第1項第1號).<br />  나. 20년이상 장기근속한 군인에 대하여는 1회에 한하여 10일간의 장기근속휴가를 허가하도록 함(令 第39條第1項第7號).<br />  다. 장기복무하사이상 군인의 휴가기간중의 공휴일은 휴가일수에서 공제하도록 하되, 휴가일수가 1월이상 계속되는 경우에는 휴가일수에 산입하도록 함(令 第39條第4項).<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 1994. 9. 30.] [대통령령 제14393호, 1994. 9. 30., 일부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[일부개정]<br />◇개정이유 및 주요골자<br />  공무원및사립학교교직원의료보험법의 개정으로 장기복무하사이상의 군인이 의료보험급여대상에 포함되어 민간의료시설을 이용하여 요양할 수 있게 됨에 따라 장기복무하사이상의 군인이 민간의료시설을 이용하여 요양을 하게 된 때에는 그 요양에 필요한 기간에 대하여 청원휴가를 얻을 수 있도록 하려는 것임.<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 1991. 1. 5.] [대통령령 제13240호, 1991. 1. 5., 전부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;">[전문개정]<br />◇개정이유<br />  군인의 복무자세와 군기강을 일신하고, 군내 인권침해사고등의 구시대적 관행을 일소하며, 장병의 기본권보장을 위한 규정을 보완하여 민주 새시대에 부응하는 군 본연의 위상을 정립하고, 현행규정중 병영생활관련사항을 삭제하여 이를 국방부장관이 정하도록 하며, 기타 세부시행사항은 각군 참모총장에게 위임함으로써 운용상의 묘를 기하고 법령체계를 합리적으로 정비·간소화하려는 것임.<br />◇주요골자<br />  가.군본연의 자세를 표상하는 강령의 내용을 수정·보완함(령 제4조).<br />  나. 장교의 직업윤리의식을 고취하기 위하여 임관선서에 관한 사항을 명문화함(령 제5조).<br />  다. 충성, 성실, 정직, 품위유지, 비밀엄수, 청렴 및 검소의 의무, 집단행위의 금지 및 직권남용의 금지등 군인으로서 갖추어야 할 복무자세에 관한 규정을 보완함(령 제6조 내지 제14조).<br />  라. 병영안에서의 인권침해사고를 방지하기 위하여 사적 제재 금지사항을 구타·폭언·가혹행위등으로 례시함(령 제15조).<br />  마. 군의 정치적 중립을 지켜 군에 대한 신뢰도를 높이기 위하여 금지되는 정치적 행위의 유형을 구체적으로 례시함(령 제18조).<br />  바. 명령의 정의를 제한적으로 규정하여 확대해석의 여지를 배제하고, 발령자에게 발령권이 없는 사항을 구체적으로 명시하는등 명령의 합법적 권위를 확보하도록 함(령 제19조 내지 제24조).<br />  사. 군 복무중 부당한 대우를 받거나 현저히 불편, 불리한 상태에 있는 경우 소속상관에게 해결을 건의할 수 있도록 고충처리규정을 신설함(령 제25조).<br />  아. 내무생활·신고·점호 등 군인의 병영생활 기타 복무에 관한 사항은 국방부장관이 정하고, 기타 세부사항은 각군 참모총장이 정하도록 함(령 제43조).<br /></li>
+      </ul>
+     </div> 
+    </div> 
+    <!-- 제목 --> 
+    <h2> 군인복무규율 </h2> 
+    <!-- 제목 //--> 
+    <div class="subtit1">
+      [시행 1970. 4. 20.] [대통령령 제4923호, 1970. 4. 20., 전부개정] 
+    </div> 
+    <p class="sbj02"> 【제정·개정이유】 </p> 
+    <div class="pgroup"> 
+     <div>
+      <ul>
+       <li style="width:auto;"> <br /></li>
+      </ul>
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- 본문 //--> 
+  <script type="text/javascript">
+//<![CDATA[
+	
+	function setHeadTitle(str) {
+		document.title = str + " | 국가법령정보센터";
+	}
+	
+	// 화면내 검색 글자 처리
+	function setTRangeSelectOn(){
+		TRange.execCommand("RemoveFormat");
+		TRange.execCommand("ForeColor", false, "#FFFFFF");
+		TRange.execCommand("BackColor", false, "#FF0000");
+	}
+
+	function setTRangeSelectOff(){
+		TRange.execCommand("RemoveFormat");
+		TRange.execCommand("ForeColor", false, "#FF0000");
+	} 
+
+	function setTRangeSelectOffUp(){
+		TRangeCopy.execCommand("RemoveFormat");
+		TRangeCopy.execCommand("ForeColor", false, "#a30200");
+	}
+
+	function setTRangeOn(){
+		TRange.execCommand("ForeColor", false, "#FF0000");
+	}
+	
+	// 화면내검색시 "|" 문자열를 활용해 찾은 검색어 글자 BackColor처리
+	function setTRangeOnAddColor(obj,setColorValue){
+		if(setColorValue == 0){
+			TRange.execCommand("BackColor", false, "#FF0000");
+		}else if(setColorValue == 1){
+			TRange.execCommand("BackColor", false, "#FF8C00");
+		}else if(setColorValue == 2){
+			TRange.execCommand("BackColor", false, "#FFD700");
+		}else if(setColorValue == 3){
+			TRange.execCommand("BackColor", false, "#33CC33");
+		}else if(setColorValue == 4){
+			TRange.execCommand("BackColor", false, "#33CCFF");
+		}
+	}
+
+    function initEDotXPress(name) {
+        $("#eDotViewr").css("display", "block");
+        $("#eDotViewr").removeAttr("onclick");
+        $("#eDotViewr").attr("onclick", "openBrlViewer('"+name+"', null, brlConfArray);return false;");
+
+    }
+//]]>
+</script> 
+  <!-- 인쇄 layer --> 
+  <!-- 화면내 검색 layer --> 
+  <script type="text/javaScript" language="javascript" defer="defer">
+<!--
+$(document).ready(function()
+{
+    // 화면내 검색 Layer의 별표본문내용 체크박스 Click Event
+    $("#bdySearchLayer").delegate("input:checkbox[id=selectSearchByl]", "click", function(e) {
+        isBylChkChg = true;
+    });
+});
+//-->
+</script> 
+  <div class="vwrap8" id="bdySearchLayer" style="display:none; top: 10px; left: 0px;"> 
+   <div class="viewla" style="top: 0px; left: 0px;"> 
+    <div class="ins"> 
+     <div class="inctn"> 
+      <input type="radio" id="preBtn" name="srcBtn" class="radio" value="1" />
+      <label for="preBtn">위로</label> 
+      <input type="radio" id="nextBtn" name="srcBtn" class="radio" value="2" checked="checked" />
+      <label for="nextBtn">아래로</label> 
+      <input type="checkbox" id="selectSearchJo" class="check" />
+      <label for="selectSearchJo" id="labelSelectSearchJo">검색조문선택</label> 
+     </div> 
+     <div class="inctn" style="padding:0 0 10px 17px;"> 
+      <fieldset> 
+       <legend>화면내검색 입력 폼</legend> 
+       <input type="text" id="bdySearch" name="bdySearch" value="" class="tx" onkeypress="javascript:if(event.keyCode==13){enterBdySearch(event,document.getElementsByName('srcBtn'));return false;}" /> 
+       <label for="bdySearch" class="label_b">검색어 입력</label> 
+       <a href="javascript:;" onclick="window.bdySearch(document.getElementsByName('srcBtn'));return false;"><img src="/LSW/images/button/btn_seh4.gif" alt="검색" /></a> 
+      </fieldset> 
+     </div> 
+     <div class="inctn" style="padding:0 0 10px 17px;"> 
+      <span id="bdyKeyVal"></span> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- 화면내 layer //--> 
+  <!-- 본문 검색 후 조문 출력 layer --> 
+  <div id="divSearchLayer" style="display: none;"> 
+   <div class="vwrap2" id="vwrapSearchList" style="left:3px;top:32px;background:none;"> 
+    <div class="viewla" style="width:245px;" id="viewSearchList"> 
+     <div class="ins" id="searchList" style="overflow: auto;"></div> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- 본문 검색 후 조문 출력 layer //--> 
+  <!-- Wide 목록저장 layer --> 
+  <div class="bx_ly" id="listSaveLayer" style="display:none"> 
+   <form id="saveForm" name="saveForm" target="_self" action="#"> 
+    <input type="image" title="전송" style="display:none;" alt="전송" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <input type="hidden" id="saveTabMenuId" name="tabMenuId" /> 
+    <input type="hidden" id="lsAstMode2" name="lsAstMode" value="1" />
+    <label for="lsAstMode2" class="label_b">모드</label> 
+    <input type="hidden" id="saveWhole" name="saveTarget" value="whole" />
+    <label for="saveWhole" class="label_b">전체저장</label> 
+    <div class="bx_inner" style="margin:1px 0;"> 
+     <p class="ly_tit">목록저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideListSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="saveListXLS" name="saveExt" value="xls" checked="checked" /> 
+        <label for="saveListXLS">XLS(엑셀)</label> 
+        <input type="radio" id="saveListTXT" name="saveExt" value="txt" /> 
+        <label for="saveListTXT">TXT(텍스트)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="submitListSave();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideListSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="inputContainer" style="display:none;"></div> 
+   </form> 
+  </div> 
+  <!-- Wide 목록저장 layer //--> 
+  <!-- 법령 조문 목록저장 layer --> 
+  <div class="bx_ly" id="joListSaveLayer" style="display:none"> 
+   <form id="joSaveForm" name="joSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" style="display:none;" alt="전송" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <input type="hidden" id="lsAstMode3" name="lsAstMode" value="1" />
+    <label for="lsAstMode3" class="label_b">모드</label> 
+    <input type="hidden" id="saveWhole2" name="saveTarget" value="whole" />
+    <label for="saveWhole2" class="label_b">전체저장</label> 
+    <div class="bx_inner" style="margin:1px 0;"> 
+     <p class="ly_tit">목록저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideJoListSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="saveJoListXLS" name="saveExt" value="xls" checked="checked" /> 
+        <label for="saveJoListXLS">XLS(엑셀)</label> 
+        <input type="radio" id="saveJoListTXT" name="saveExt" value="txt" /> 
+        <label for="saveJoListTXT">TXT(텍스트)</label> 
+        <input type="radio" id="saveHWPList" name="saveExt" value="hwp" /> 
+        <label for="saveHWPList">한글(본문)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="javascript:submitJoListSave();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="javascript:SaveWindow.hideJoListSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 법령 조문 목록저장 layer //--> 
+  <!-- 법령 조문 본문 저장 layer --> 
+  <div class="bx_ly" id="joInfoSaveLayer" style="display:none"> 
+   <form id="joInfoSaveForm" name="joInfoSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <div class="bx_inner" style="margin:1px 0;"> 
+     <p class="ly_tit">내용저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideJoInfoSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont"> 
+      <div class="ly_tx_bx" id="joInfoSaveLayerLoding"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="joDocSelectIdHWP" name="saveExt" value="hwp" checked="checked" /> 
+        <label for="joDocSelectIdHWP">한글(HWP)</label> 
+        <input type="radio" id="joDocSelectIdPDF" name="saveExt" value="pdf" /> 
+        <label for="joDocSelectIdPDF">PDF</label> 
+        <input type="radio" id="joDocSelectIdDOC" name="saveExt" value="doc" /> 
+        <label for="joDocSelectIdDOC">오피스(DOC)</label> 
+       </div> 
+       <div class="ly_btn_bx"> 
+        <a href="javascript:;" class="btn type" onclick="joBeforeSavePrint(); return false;">저장</a> 
+        <a href="javascript:;" class="btn type" onclick="SaveWindow.hideJoInfoSave();">닫기</a> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 법령 조문 본문 저장 layer //--> 
+  <div class="vwrap7" id="htmlSaveLayer" style="display:none"> 
+   <form id="htmlsaveForm" name="htmlsaveForm" target="_self" action="#"> 
+    <fieldset> 
+     <legend>파일형식 선택</legend> 
+     <input type="image" title="전송" alt="전송" style="display:none;" /> 
+     <input type="hidden" name="save" value="save" /> 
+     <!-- id="save" --> 
+     <div class="contwrap" style="margin:1px 0;"> 
+      <div class="viewla"> 
+       <div class="ins"> 
+        <div class="inctn"> 
+         <ul> 
+          <li class="itit">파일형식</li> 
+          <li class="rdi"> <input type="radio" id="saveHtmlHTML" name="saveExt" class="radio" value="html" checked="checked" /><label for="saveHtmlHTML">HTML</label> <input type="radio" id="saveHtmlXLSb" name="saveExt" class="radio" value="xls" /><label for="saveHtmlXLSb">XLS(엑셀)</label> </li> 
+         </ul> 
+        </div> 
+        <!-- button --> 
+        <div class="btnc2_1"> 
+         <input type="image" onclick="javascript:submitHtmlContent();" src="/LSW/images/button/btn_save2.gif" alt="저장" /> 
+         <span class="btn_close"><a href="javascript:;" onkeypress="" onclick="javascript:SaveWindow.hideHtmlSave();"><img src="/LSW/images/button/btn_close2.gif" alt="닫기" /></a></span> 
+        </div> 
+        <!-- button //--> 
+       </div> 
+      </div> 
+     </div> 
+    </fieldset> 
+   </form> 
+  </div> 
+  <!-- 목록저장 layer //--> 
+  <!-- 신구조문 저장 layer --> 
+  <div class="bx_ly" id="newSaveLayer" style="display:none"> 
+   <form id="newSaveForm" name="newSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner"> 
+     <p class="ly_tit" style="margin-top: 0px;margin-bottom: 0px;">내용저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideNewSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" id="newSaveLayerLoding"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="newSaveHTML" name="newSaveExt" value="html" checked="checked" /> 
+        <label for="newSaveHTML">HTML</label> 
+        <input type="radio" id="newSaveHWP" name="newSaveExt" value="hwp" /> 
+        <label for="newSaveHWP">HWP(한글)</label> 
+        <input type="radio" id="newSaveXLS" name="newSaveExt" value="xls" /> 
+        <label for="newSaveXLS">XLS(엑셀)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="submitNewContent();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideNewSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 신구조문저장 layer //--> 
+  <!-- 법령비교 저장 layer --> 
+  <div class="bx_ly" id="lawCompareSaveLayer" style="display:none"> 
+   <form id="lawCompareSaveForm" name="lawCompareSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner"> 
+     <p class="ly_tit" style="margin-top: 0px;margin-bottom: 0px;">내용저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideLawCompareSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" id="lawCmpSaveLayerLoding"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="lawCmpSaveHWP" name="lawCmpSaveExt" class="lawCmpSaveExt" value="hwp" checked="checked" /> 
+        <label for="lawCmpSaveHWP">한글(HWP)</label> 
+        <input type="radio" id="lawCmpSavePDF" name="lawCmpSaveExt" class="lawCmpSaveExt" value="pdf" /> 
+        <label for="lawCmpSavePDF">PDF</label> 
+        <input type="radio" id="lawCmpSaveDOC" name="lawCmpSaveExt" class="lawCmpSaveExt" value="doc" /> 
+        <label for="lawCmpSaveDOC">오피스(DOC)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="submitLawCompareContent();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideLawCompareSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 법령비교저장 layer //--> 
+  <!-- 본문 저장 layer --> 
+  <div class="bx_ly" id="infoSaveLayer" style="display:none;"> 
+   <form id="infoSaveForm" name="infoSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner"> 
+     <p class="ly_tit" style="margin-top: 0px;margin-bottom: 0px;">목록저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideInfoSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" id="infoSaveLayerLoding"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="saveHWP" name="saveExt" value="hwp" checked="checked" /> 
+        <label for="saveHWP">HWP(한글)</label> 
+        <input type="radio" id="saveTXTb" name="saveExt" value="txt" /> 
+        <label for="saveTXTb">TXT(텍스트)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="submitContent();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideInfoSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 본문 저장 layer //--> 
+  <!-- 전체 제개정이유 저장 layer --> 
+  <div class="bx_ly" id="lsRvsRsnInfoSaveLayer" style="display:none;"> 
+   <form id="lsRvsRsnInfoSaveForm" name="lsRvsRsnInfoSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <input type="hidden" name="lsRvsGubun" value="all" /> 
+    <div class="bx_inner" style="margin:1px 0;"> 
+     <p class="ly_tit" style="margin-top: 0px; margin-bottom: 0px;">목록저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideLsRvsRsnSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont"> 
+      <div class="ly_tx_bx" id="lsRvsRsnInfoSaveLayerLoding"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="saveRvsRsnHWP" name="saveExt" value="hwp" checked="checked" /> 
+        <label for="saveRvsRsnHWP">HWP(한글)</label> 
+        <input type="radio" id="saveRvsRsnTXTb" name="saveExt" value="txt" /> 
+        <label for="saveRvsRsnTXTb">TXT(텍스트)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="javascript:submitRvsRsnContent();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideLsRvsRsnSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 전체 제개정이유 저장 layer --> 
+  <!-- 학칙공단 제개정문 저장 layer --> 
+  <div class="bx_ly" id="schlRvsRsnSaveLayer" style="display:none;"> 
+   <form id="schlPubRulSaveForm" name="schlPubRulSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <input type="hidden" id="seq" name="schlPubRulSeq" value="" /> 
+    <div class="bx_inner"> 
+     <p class="ly_tit" style="margin-top: 0px;margin-bottom: 0px;">목록 저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideSchlPubRulRvsRsnSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" id="schlInfoSaveLayerLoding"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="saveSchlHWP" name="saveExt" value="hwp" checked="checked" /> 
+        <label for="saveSchlHWP">HWP(한글)</label> 
+        <input type="radio" id="saveSchlTXTb" name="saveExt" value="txt" /> 
+        <label for="saveSchlTXTb">TXT(텍스트)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="submitSchlPubRulContent();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideSchlPubRulRvsRsnSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 학칙공단 제개정문 저장 layer //--> 
+  <!-- 영문 본문 저장 layer --> 
+  <div class="bx_ly" id="engInfoSaveLayer" style="display:none"> 
+   <form id="engInfoSaveForm" name="engInfoSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner" style="height: 160px;"> 
+     <p class="ly_tit" style="margin: 0 0 10px 0;">목록저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideEngInfoSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" style="padding: 0;"> 
+      <div class="ly_tx_bx" style="height: 60px;"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="docSelectIdHWP" name="docSelectId" class="radio" value="hwp" checked="checked" /> 
+        <label for="docSelectIdHWP">한글(HWP)</label> 
+        <input type="radio" id="docSelectIdPDF" name="docSelectId" class="radio" value="pdf" /> 
+        <label for="docSelectIdPDF">PDF</label> 
+        <input type="radio" id="docSelectIdDOC" name="docSelectId" class="radio" value="doc" /> 
+        <label for="docSelectIdDOC">오피스(DOC)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="engLsBeforeSavePrint();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideEngInfoSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 영문 본문 저장 layer //--> 
+  <!-- 다국어 본문 저장 layer --> 
+  <div class="bx_ly" id="multiLingualActInfoSaveLayer" style="display:none"> 
+   <form id="multiLingualActInfoSaveForm" name="multiLingualActInfoSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner" style="height: 160px;"> 
+     <p class="ly_tit" style="margin: 0 0 10px 0;">본문저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideMultiLingualActInfoSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" style="padding: 0;"> 
+      <div class="ly_tx_bx" style="height: 60px;"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="multiLsHwp" name="docSelectId" class="radio" value="hwp" checked="checked" /> 
+        <label for="multiLsHwp">한글(HWP)</label> 
+        <input type="radio" id="multiLsPdf" name="docSelectId" class="radio" value="pdf" /> 
+        <label for="multiLsPdf">PDF</label> 
+        <input type="radio" id="multiLsDoc" name="docSelectId" class="radio" value="doc" /> 
+        <label for="multiLsDoc">오피스(DOC)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="multiLingualActSavePrint();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideMultiLingualActInfoSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 다국어 본문 저장 layer //--> 
+  <!-- 법령용어 저장 layer --> 
+  <div class="vwrap7" id="lsTrmInfoSaveLayer" style="display:none"> 
+   <form id="lsTrmInfoSaveForm" name="lsTrmInfoSaveForm" target="_self" action="#" onsubmit="return lsTrmBeforeSavePrint()"> 
+    <fieldset> 
+     <legend>파일형식 선택</legend> 
+     <input type="image" title="전송" alt="전송" style="display:none;" /> 
+     <input type="hidden" id="saveQuery" name="lsTrm" />
+     <label for="saveQuery" style="display:none">법령용어명</label> 
+     <input type="hidden" name="save" value="save" /> 
+     <!--  id="save" --> 
+     <div class="contwrap" style="margin:1px 0;"> 
+      <div class="viewla"> 
+       <div class="ins"> 
+        <div class="inctn"> 
+         <ul> 
+          <li class="itit">파일형식</li> 
+          <li class="rdi" style="width:220px;text-align:center;"> <input type="radio" id="lsTrmDocSelectIdHWP" name="lsTrmDocSelectId" class="radio" value="hwp" checked="checked" /><label for="lsTrmDocSelectIdHWP">한글(HWP)</label> <input type="radio" id="lsTrmDocSelectIdPDF" name="lsTrmDocSelectId" class="radio" value="pdf" /><label for="lsTrmDocSelectIdPDF">PDF</label> 
+           <!-- <input type="radio" id="docSelectIdDOC" name="docSelectId" class="radio" value="doc" /><label for="docSelectIdDOC">오피스(DOC)</label>--> </li> 
+         </ul> 
+        </div> 
+        <!-- button --> 
+        <div class="btnc2_1"> 
+         <input type="image" onclick="javascript:lsTrmBeforeSavePrint();return false;" src="/LSW/images/button/btn_save2.gif" alt="저장" /> 
+         <span class="btn_close"><a href="javascript:;" onkeypress="" onclick="javascript:SaveWindow.hideInfoSaveNew();"><img src="/LSW/images/button/btn_close2.gif" alt="닫기" /></a></span> 
+        </div> 
+        <!-- button //--> 
+       </div> 
+      </div> 
+     </div> 
+    </fieldset> 
+   </form> 
+  </div> 
+  <!-- 법령용어 저장 layer TXT(텍스트) 저장 추가 //--> 
+  <!-- 법령용어 저장 layer --> 
+  <div class="bx_lyTrm" id="lsTrmInfoSaveLayer2" style="display:none"> 
+   <form id="lsTrmInfoSaveForm2" name="lsTrmInfoSaveForm2" target="_self" action="#" onsubmit="return lsTrmBeforeSavePrint2()"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" id="saveQuery1" name="lsTrm" />
+    <label for="saveQuery1" style="display:none">법령용어명</label> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner" style="margin:1px 0;"> 
+     <p class="ly_tit">목록저장</p> 
+     <button class="btn_clse" onclick="javascript:SaveWindow.hideInfoSaveNew();return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="lsTrmDocSelectIdHWP1" name="saveExt" class="radio" value="hwp" checked="checked" />
+        <label for="lsTrmDocSelectIdHWP1">한글(HWP)</label> 
+        <input type="radio" id="lsTrmDocSelectIdTXT1" name="saveExt" class="radio" value="txt" />
+        <label for="lsTrmDocSelectIdTXT1">TXT(텍스트)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <input type="image" onclick="javascript:lsTrmBeforeSavePrint2();return false;" src="/LSW/images/button/btn_save2.gif" alt="저장" /> 
+       <input type="image" onclick="javascript:SaveWindow.hideInfoSaveNew();return false;" src="/LSW/images/button/btn_close2.gif" alt="닫기" /> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 법령용어 저장 layer layer TXT(텍스트) 저장 추가 //--> 
+  <!-- 3단비교  저장 layer --> 
+  <div class="vwrap7" id="thdCmpSaveLayer" style="display:none"> 
+   <form id="thdCmpSaveForm" name="thdCmpSaveForm" target="_self" action="#"> 
+    <fieldset> 
+     <legend>파일형식 선택</legend> 
+     <input type="image" title="전송" alt="전송" style="display:none;" /> 
+     <input type="hidden" name="save" value="save" /> 
+     <!-- id="save" --> 
+     <div class="contwrap" style="margin:1px 0;"> 
+      <div class="viewla"> 
+       <div class="ins" id="thdCmpSaveLayerLoding"> 
+        <div class="inctn"> 
+         <ul> 
+          <li class="itit">파일형식</li> 
+          <li class="rdi"> <input type="radio" id="saveThdCmpHTML" name="saveExt" class="radio" value="html" checked="checked" /><label for="saveThdCmpHTML">HTML</label> <input type="radio" id="saveThdCmpHWP" name="saveExt" class="radio" value="hwp" /><label for="saveThdCmpHWP">HWP(한글)</label> <input type="radio" id="saveThdCmpXLSb" name="saveExt" class="radio" value="xls" /><label for="saveThdCmpXLSb">XLS(엑셀)</label> </li> 
+         </ul> 
+        </div> 
+        <!-- button --> 
+        <div class="btnc2_1"> 
+         <input type="image" onclick="javascript:submitListSaveThdCmpPrc();return false;" src="/LSW/images/button/btn_save2.gif" alt="저장" /> 
+         <span class="btn_close"><a href="javascript:;" onkeypress="" onclick="javascript:SaveWindow.hideThdCmpSave();"><img src="/LSW/images/button/btn_close2.gif" alt="닫기" /></a></span> 
+        </div> 
+        <!-- button //--> 
+       </div> 
+      </div> 
+     </div> 
+    </fieldset> 
+   </form> 
+  </div> 
+  <!-- LUM 3단비교, 법령단위비교 저장 Layer --> 
+  <div class="bx_ly" id="thdCmpNewSaveLayer" style="display:none;"> 
+   <form id="thdCmpNewSaveForm" name="thdCmpNewSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <input type="hidden" name="chrClsCd" value="010202" /> 
+    <div class="bx_inner"> 
+     <p class="ly_tit" style="margin-top: 0px; margin-bottom: 0px;">내용저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideThdCmpNewSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" style="width: 360px;"> 
+      <div class="ly_tx_bx" id="thdCmpNewSaveLayerLoding" style="padding: 12px 8px;"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="saveThdCmpNewHTML" name="saveExt" value="html" checked="checked" /> 
+        <label for="saveThdCmpNewHTML">HTML</label> 
+        <input type="radio" id="saveThdCmpNewHWP" name="saveExt" value="hwp" /> 
+        <label for="saveThdCmpNewHWP">HWP(한글)</label> 
+        <input type="radio" id="saveThdCmpNewXLSb" name="saveExt" value="xls" /> 
+        <label for="saveThdCmpNewXLSb">XLS(엑셀)</label> 
+        <input type="radio" id="saveThdCmpNewPDF" name="saveExt" value="pdf" /> 
+        <label for="saveThdCmpNewPDF">PDF</label> 
+        <input type="radio" id="saveThdCmpDOC" name="saveExt" value="doc" /> 
+        <label for="saveThdCmpDOC">DOC</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="javascript:submitListSaveLumThdCmpPrc();return false;">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="javascript:SaveWindow.hideThdCmpNewSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 3단비교 임시 저장 layer --> 
+  <div class="vwrap7" id="thdCmpTmpSaveLayer" style="display:none"> 
+   <form id="thdCmpTmpSaveForm" name="thdCmpTmpSaveForm" target="_self" action="#"> 
+    <fieldset> 
+     <legend>파일형식 선택</legend> 
+     <input type="image" title="전송" alt="전송" style="display:none;" /> 
+     <input type="hidden" name="save" value="save" /> 
+     <!-- id="save" --> 
+     <div class="contwrap" style="margin:1px 0;"> 
+      <div class="viewla"> 
+       <div class="ins" id="thdCmpTmpSaveLayerLoding"> 
+        <div class="inctn"> 
+         <ul> 
+          <li class="itit">파일형식</li> 
+          <li class="rdi"> <input type="radio" id="saveThdCmpTmpSaveHTML" name="saveExt" class="radio" value="html" checked="checked" /><label for="saveThdCmpTmpSaveHTML">HTML</label> <input type="radio" id="saveThdCmpTmpSaveXLSb" name="saveExt" class="radio" value="xls" /><label for="saveThdCmpTmpSaveXLSb">XLS(엑셀)</label> <input type="radio" id="saveThdCmpTmpSaveHWP" name="saveExt" class="radio" value="hwp" /><label for="saveThdCmpTmpSaveHWP">HWP(한글)</label> </li> 
+         </ul> 
+        </div> 
+        <!-- button --> 
+        <div class="btnc2_1"> 
+         <input type="image" onclick="javascript:submitListSaveThdCmpTmpPrc();return false;" src="/LSW/images/button/btn_save2.gif" alt="저장" /> 
+         <span class="btn_close"><a href="javascript:;" onkeypress="" onclick="javascript:SaveWindow.hideThdCmpTmpSave();"><img src="/LSW/images/button/btn_close2.gif" alt="닫기" /></a></span> 
+        </div> 
+        <!-- button //--> 
+       </div> 
+      </div> 
+     </div> 
+    </fieldset> 
+   </form> 
+  </div> 
+  <!-- 행정규칙 신구조문 저장 layer --> 
+  <div class="bx_ly" id="admRulOANSaveLayer" style="display:none"> 
+   <form id="admRulOANSaveForm" name="admRulOANSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner"> 
+     <p class="ly_tit" style="margin-top: 0px;margin-bottom: 0px;">내용저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideAdmRulOANSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" id="admRulOANSaveLayerLoding"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="admRulOANSaveHTML" name="admRulOANSaveExt" value="html" checked="checked" /> 
+        <label for="admRulOANSaveHTML">HTML</label> 
+        <input type="radio" id="admRulOANSaveHWP" name="admRulOANSaveExt" value="hwp" /> 
+        <label for="admRulOANSaveHWP">HWP(한글)</label> 
+        <input type="radio" id="admRulOANSaveXLS" name="admRulOANSaveExt" value="xls" /> 
+        <label for="admRulOANSaveXLS">XLS(엑셀)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="submitAdmRulOAN();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideAdmRulOANSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 행정규칙 신구조문저장 layer //--> 
+  <!-- 학칙규정 신구조문 저장 layer --> 
+  <div class="bx_ly" id="schlPubRulOANSaveLayer" style="display:none"> 
+   <form id="schlPubRulOANSaveForm" name="schlPubRulOANSaveForm" target="_self" action="#"> 
+    <input type="image" title="전송" alt="전송" style="display:none;" /> 
+    <input type="hidden" name="save" value="save" /> 
+    <div class="bx_inner"> 
+     <p class="ly_tit" style="margin-top: 0px;margin-bottom: 0px;">내용저장</p> 
+     <button class="btn_clse" onclick="SaveWindow.hideSchlPubRulOANSave(); return false;"> <span class="blind">닫기</span> </button> 
+     <div class="ly_cont" id="schlPubRulOANSaveLayerLoding"> 
+      <div class="ly_tx_bx"> 
+       <p class="tx">파일형식</p> 
+       <div class="ly_inp_bx"> 
+        <input type="radio" id="schlPubRulOANSaveHTML" name="schlPubRulOANSaveExt" value="html" checked="checked" /> 
+        <label for="schlPubRulOANSaveHTML">HTML</label> 
+        <input type="radio" id="schlPubRulOANSaveHWP" name="schlPubRulOANSaveExt" value="hwp" /> 
+        <label for="schlPubRulOANSaveHWP">HWP(한글)</label> 
+        <input type="radio" id="schlPubRulOANSaveXLS" name="schlPubRulOANSaveExt" value="xls" /> 
+        <label for="schlPubRulOANSaveXLS">XLS(엑셀)</label> 
+       </div> 
+      </div> 
+      <div class="ly_btn_bx"> 
+       <a href="javascript:;" class="btn type" onclick="submitSchlPubRulOAN();">저장</a> 
+       <a href="javascript:;" class="btn type" onclick="SaveWindow.hideSchlPubRulOANSave();">닫기</a> 
+      </div> 
+     </div> 
+    </div> 
+   </form> 
+  </div> 
+  <!-- 학칙규정 신구조문저장 layer //-->   
+  <script type="text/javascript" src="/LSW/js/common/hrefRemove.js"></script>  
+ </body>
+</html>

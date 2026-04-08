@@ -1,0 +1,14 @@
+{
+  "source_id": "law-enforcement-rule-current",
+  "law_name": "군인의 지위 및 복무에 관한 기본법 시행규칙",
+  "scope": "현행 본문",
+  "source_type": "law_text",
+  "source_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=012599",
+  "notes": "현행 총리령/부령 수준 세부 규정 본문.",
+  "retrieved_at": "2026-04-08T16:30:58.712248+00:00",
+  "artifacts": [
+    "page.html",
+    "body.pdf"
+  ],
+  "pdf_url": "https://www.law.go.kr/LSW/lsPdfPrint.do?ancYnChk=0&bylChaChk=N&efGubun=Y&efYd=20260108&joAllCheck=Y&joEfOutPutYn=on&lsiSeq=282203&mokChaChk=N"
+}

@@ -1,0 +1,12 @@
+{
+  "source_id": "law-enforcement-rule-reasons",
+  "law_name": "군인의 지위 및 복무에 관한 기본법 시행규칙",
+  "scope": "제·개정이유",
+  "source_type": "revision_reason",
+  "source_url": "https://www.law.go.kr/LSW/lsRvsRsnListP.do?chrClsCd=010202&lsId=012599&lsRvsGubun=all",
+  "notes": "서식·세부행정 절차 개정이유 출처.",
+  "retrieved_at": "2026-04-08T16:30:58.923978+00:00",
+  "artifacts": [
+    "page.html"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "source_id": "military-service-regulation-revision-docs",
+  "law_name": "군인복무규율",
+  "scope": "제·개정문 목록",
+  "source_type": "old_new_comparison",
+  "source_url": "https://www.law.go.kr/LSW/lsRvsDocListP.do?lsId=003019",
+  "notes": "과거 개정문과 비교 자료로 이어지는 핵심 목록 페이지.",
+  "retrieved_at": "2026-04-08T16:30:59.814038+00:00",
+  "artifacts": [
+    "page.html"
+  ]
+}

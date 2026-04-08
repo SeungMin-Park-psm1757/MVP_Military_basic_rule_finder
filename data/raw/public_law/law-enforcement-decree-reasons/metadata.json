@@ -1,0 +1,12 @@
+{
+  "source_id": "law-enforcement-decree-reasons",
+  "law_name": "군인의 지위 및 복무에 관한 기본법 시행령",
+  "scope": "제·개정이유",
+  "source_type": "revision_reason",
+  "source_url": "https://www.law.go.kr/LSW/lsRvsRsnListP.do?chrClsCd=010102&lsId=012591",
+  "notes": "운영상 세부 개정이유가 누적되는 핵심 출처.",
+  "retrieved_at": "2026-04-08T16:30:58.502877+00:00",
+  "artifacts": [
+    "page.html"
+  ]
+}

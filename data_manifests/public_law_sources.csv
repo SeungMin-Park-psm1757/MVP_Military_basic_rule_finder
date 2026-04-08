@@ -1,15 +1,15 @@
 ﻿source_id,law_name,scope,source_type,url,notes
-law-basic-current,군인의 지위 및 복무에 관한 기본법,현행 본문,law_text,https://www.law.go.kr/LSW//lsSideInfoP.do?docCls=jo&joBrNo=00&joNo=0031&lsiSeq=268083&urlMode=lsScJoRltInfoR,공개 대체 실증대상. 현행 법률 본문과 관련 정보 확인용.
+law-basic-current,군인의 지위 및 복무에 관한 기본법,현행 본문,law_text,https://www.law.go.kr/LSW/lsInfoP.do?lsId=012438,공개 대체 실증대상. 현행 법률 본문과 관련 정보 확인용.
 law-basic-reasons,군인의 지위 및 복무에 관한 기본법,제·개정이유,revision_reason,https://www.law.go.kr/LSW/lsRvsRsnListP.do?chrClsCd=010202&lsId=012438&lsRvsGubun=all,연혁별 개정 이유를 수집하는 핵심 출처.
 law-basic-revision-docs,군인의 지위 및 복무에 관한 기본법,제·개정문 목록,old_new_comparison,https://www.law.go.kr/LSW/lsRvsDocListP.do?lsId=012438,공개 페이지 기준 신구대비·제개정문 확인용 핵심 목록.
-law-enforcement-decree-current,군인의 지위 및 복무에 관한 기본법 시행령,현행 본문,law_text,https://www.law.go.kr/LSW/LsiJoLinkP.do?lsNm=%EA%B5%B0%EC%9D%B8%EC%9D%98+%EC%A7%80%EC%9C%84+%EB%B0%8F+%EB%B3%B5%EB%AC%B4%EC%97%90+%EA%B4%80%ED%95%9C+%EA%B8%B0%EB%B3%B8%EB%B2%95+%EC%8B%9C%ED%96%89%EB%A0%B9,현행 대통령령 본문.
+law-enforcement-decree-current,군인의 지위 및 복무에 관한 기본법 시행령,현행 본문,law_text,https://www.law.go.kr/LSW/lsInfoP.do?lsId=012591,현행 대통령령 본문.
 law-enforcement-decree-reasons,군인의 지위 및 복무에 관한 기본법 시행령,제·개정이유,revision_reason,https://www.law.go.kr/LSW/lsRvsRsnListP.do?chrClsCd=010102&lsId=012591,운영상 세부 개정이유가 누적되는 핵심 출처.
 law-enforcement-decree-revision-docs,군인의 지위 및 복무에 관한 기본법 시행령,제·개정문 목록,old_new_comparison,https://www.law.go.kr/LSW/lsRvsDocListP.do?lsId=012591,공개 페이지 기준 시행령 신구대비·제개정문 확인용 핵심 목록.
-law-enforcement-rule-current,군인의 지위 및 복무에 관한 기본법 시행규칙,현행 본문,law_text,https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=218451,현행 총리령/부령 수준 세부 규정 본문.
+law-enforcement-rule-current,군인의 지위 및 복무에 관한 기본법 시행규칙,현행 본문,law_text,https://www.law.go.kr/LSW/lsInfoP.do?lsId=012599,현행 총리령/부령 수준 세부 규정 본문.
 law-enforcement-rule-reasons,군인의 지위 및 복무에 관한 기본법 시행규칙,제·개정이유,revision_reason,https://www.law.go.kr/LSW/lsRvsRsnListP.do?chrClsCd=010202&lsId=012599&lsRvsGubun=all,서식·세부행정 절차 개정이유 출처.
 law-enforcement-rule-revision-docs,군인의 지위 및 복무에 관한 기본법 시행규칙,제·개정문 목록,old_new_comparison,https://www.law.go.kr/LSW/lsRvsDocListP.do?lsId=012599,공개 페이지 기준 시행규칙 신구대비·제개정문 확인용 핵심 목록.
 military-service-regulation-initial,군인복무규율,초기 제정본,history_note,https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=&chrClsCd=010202&efYd=19660315&lsiSeq=15808&urlMode=lsInfoP,군인기본법 이전 체계의 출발점 확인용 초기 제정본.
-military-service-regulation-final,군인복무규율,말기 연혁본,history_note,https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=&chrClsCd=010202&efYd=20150713&lsiSeq=173163&urlMode=lsInfoP,군인기본법 제정 직전 시기의 말기 버전 확인용.
+military-service-regulation-final,군인복무규율,말기 연혁본,history_note,https://www.law.go.kr/LSW/lsInfoP.do?chrClsCd=010102&lsId=003019&lsiSeq=172905&viewCls=lsPtnThdCmp,군인기본법 제정 직전 시기의 말기 버전 확인용.
 military-service-regulation-revision-docs,군인복무규율,제·개정문 목록,old_new_comparison,https://www.law.go.kr/LSW/lsRvsDocListP.do?lsId=003019,과거 개정문과 비교 자료로 이어지는 핵심 목록 페이지.
 military-service-regulation-reasons,군인복무규율,제·개정이유 목록,revision_reason,https://www.law.go.kr/LSW/lsRvsRsnListP.do?lsId=003019&chrClsCd=010202&lsRvsGubun=all,군인기본법 이전 복무규율 개정 취지와 연혁 설명 확보용 목록 페이지.
 openapi-current-law-body-guide,국가법령정보 공동활용,현행법령(시행일) 본문 조회 API,api_guide,https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=lsEfYdInfoGuide,full ingest 시 law.go.kr 본문 수집용 공식 가이드.

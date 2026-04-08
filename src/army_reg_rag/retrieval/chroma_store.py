@@ -148,6 +148,11 @@ class _JsonFallbackStore:
             "distances": [[1.0 - float(row[0]) for row in rows]],
         }
 
+    def reset(self) -> None:
+        self.records = {}
+        if self.path.exists():
+            self.path.unlink()
+
 
 class ChromaStore:
     def __init__(self, settings: Settings):
@@ -175,6 +180,16 @@ class ChromaStore:
 
     def count(self) -> int:
         return self.collection.count()
+
+    def reset(self) -> None:
+        if self._backend == "chroma":
+            self.client.delete_collection(name=self.settings.app.collection_name)
+            self.collection = self.client.get_or_create_collection(
+                name=self.settings.app.collection_name,
+                metadata={"hnsw:space": "cosine"},
+            )
+            return
+        self.collection.reset()
 
     def upsert(self, chunks: Iterable[DocumentChunk]) -> int:
         chunk_list = list(chunks)
@@ -210,18 +225,22 @@ class ChromaStore:
         if source_type:
             where["source_type"] = source_type
 
+        query_where = where if where else None
+        if law_name and law_name != "전체" and source_type:
+            query_where = {"$and": [{"law_name": law_name}, {"source_type": source_type}]}
+
         if self._backend == "chroma":
             result = self.collection.query(
                 query_embeddings=[self.embedder.embed_query(query_text)],
                 n_results=top_k,
-                where=where if where else None,
+                where=query_where,
                 include=["documents", "metadatas", "distances"],
             )
         else:
             result = self.collection.query(
                 query_embedding=self.embedder.embed_query(query_text),
                 n_results=top_k,
-                where=where if where else None,
+                where=query_where,
             )
 
         hits: list[SearchHit] = []

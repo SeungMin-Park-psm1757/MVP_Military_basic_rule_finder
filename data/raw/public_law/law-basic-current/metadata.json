@@ -1,0 +1,14 @@
+{
+  "source_id": "law-basic-current",
+  "law_name": "군인의 지위 및 복무에 관한 기본법",
+  "scope": "현행 본문",
+  "source_type": "law_text",
+  "source_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=012438",
+  "notes": "공개 대체 실증대상. 현행 법률 본문과 관련 정보 확인용.",
+  "retrieved_at": "2026-04-08T16:30:57.660144+00:00",
+  "artifacts": [
+    "page.html",
+    "body.pdf"
+  ],
+  "pdf_url": "https://www.law.go.kr/LSW/lsPdfPrint.do?ancYnChk=0&bylChaChk=N&efGubun=Y&efYd=20260108&joAllCheck=Y&joEfOutPutYn=on&lsiSeq=268083&mokChaChk=N"
+}

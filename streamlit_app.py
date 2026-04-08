@@ -10,6 +10,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from army_reg_rag.config import load_settings
+from army_reg_rag.corpus import get_corpus_input_path
 from army_reg_rag.domain.models import SearchHit
 from army_reg_rag.llm.gemini_client import QUOTA_BLOCK_MESSAGE
 from army_reg_rag.llm.usage_tracker import GeminiUsageTracker
@@ -279,10 +280,10 @@ def inject_styles() -> None:
 def load_corpus_rows() -> list[dict]:
     settings = get_settings()
     rows_by_id: dict[str, dict] = {}
-    for path in [settings.demo_input_path, settings.processed_dir / "law_corpus.jsonl"]:
-        for row in read_jsonl(path):
-            row_id = str(row.get("id") or f"{row.get('law_name', '')}:{row.get('article_title', '')}:{len(rows_by_id)}")
-            rows_by_id[row_id] = row
+    corpus_path = get_corpus_input_path(settings)
+    for row in read_jsonl(corpus_path):
+        row_id = str(row.get("id") or f"{row.get('law_name', '')}:{row.get('article_title', '')}:{len(rows_by_id)}")
+        rows_by_id[row_id] = row
     return list(rows_by_id.values())
 
 
@@ -625,8 +626,9 @@ def ensure_store_ready() -> ChromaStore:
     store = get_store()
     if store.count() > 0:
         return store
-    if settings.demo_input_path.exists():
-        ingest_jsonl(str(settings.demo_input_path), store)
+    corpus_path = get_corpus_input_path(settings)
+    if corpus_path.exists():
+        ingest_jsonl(str(corpus_path), store)
     return store
 
 
@@ -701,24 +703,40 @@ def handle_example_click(
 
 def render_bootstrap_panel(rows: list[dict]) -> None:
     settings = get_settings()
-    st.warning("아직 컬렉션이 비어 있습니다. 아래 버튼으로 데모 코퍼스를 자동 적재하거나 README 절차를 먼저 실행해 주세요.")
+    corpus_path = get_corpus_input_path(settings)
+    using_full_corpus = corpus_path == settings.processed_dir / "law_corpus.jsonl"
+    if using_full_corpus:
+        st.warning("아직 컬렉션이 비어 있습니다. 아래 버튼으로 실제 원문 코퍼스를 적재하거나 전체 수집 절차를 먼저 실행해 주세요.")
+        button_label = "실제 원문 코퍼스 자동 적재"
+        spinner_text = "실제 원문 코퍼스를 적재하고 있습니다..."
+        success_text = "실제 원문 코퍼스를 적재했습니다. 화면을 다시 불러옵니다."
+        missing_text = "실제 원문 코퍼스가 없습니다. 먼저 build_public_corpus.py를 실행해 주세요."
+        command_text = "python scripts/build_public_corpus.py"
+        caption_label = "실제 원문"
+    else:
+        st.warning("아직 컬렉션이 비어 있습니다. 아래 버튼으로 데모 코퍼스를 자동 적재하거나 README 절차를 먼저 실행해 주세요.")
+        button_label = "데모 코퍼스 자동 적재"
+        spinner_text = "데모 코퍼스를 적재하고 있습니다..."
+        success_text = "데모 코퍼스를 적재했습니다. 화면을 다시 불러옵니다."
+        missing_text = "데모 입력 파일이 없습니다. 먼저 build_sample_corpus.py를 실행해 주세요."
+        command_text = (
+            "python scripts/build_sample_corpus.py\n"
+            "python scripts/ingest_to_chroma.py --input data/sample/processed/sample_documents.jsonl"
+        )
+        caption_label = "샘플"
     col1, col2 = st.columns([1, 1.1])
     with col1:
-        if st.button("데모 코퍼스 자동 적재", use_container_width=True):
-            if settings.demo_input_path.exists():
-                with st.spinner("데모 코퍼스를 적재하고 있습니다..."):
-                    ingest_jsonl(str(settings.demo_input_path), get_store())
-                st.success("데모 코퍼스를 적재했습니다. 화면을 다시 불러옵니다.")
+        if st.button(button_label, use_container_width=True):
+            if corpus_path.exists():
+                with st.spinner(spinner_text):
+                    ingest_jsonl(str(corpus_path), get_store())
+                st.success(success_text)
                 st.rerun()
             else:
-                st.error("데모 입력 파일이 없습니다. 먼저 build_sample_corpus.py를 실행해 주세요.")
+                st.error(missing_text)
     with col2:
-        st.code(
-            "python scripts/build_sample_corpus.py\n"
-            "python scripts/ingest_to_chroma.py --input data/sample/processed/sample_documents.jsonl",
-            language="bash",
-        )
-    st.caption(f"로컬 샘플 코퍼스 {len(rows)}건이 준비되어 있습니다.")
+        st.code(command_text, language="bash")
+    st.caption(f"현재 준비된 {caption_label} 문서 수: {len(rows)}")
 
 
 def render_question_box(max_chars: int) -> tuple[bool, str]:

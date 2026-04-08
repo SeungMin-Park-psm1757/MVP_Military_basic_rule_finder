@@ -1,0 +1,14 @@
+{
+  "source_id": "military-service-regulation-initial",
+  "law_name": "군인복무규율",
+  "scope": "초기 제정본",
+  "source_type": "history_note",
+  "source_url": "https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=&chrClsCd=010202&efYd=19660315&lsiSeq=15808&urlMode=lsInfoP",
+  "notes": "군인기본법 이전 체계의 출발점 확인용 초기 제정본.",
+  "retrieved_at": "2026-04-08T16:30:59.081421+00:00",
+  "artifacts": [
+    "page.html",
+    "body.pdf"
+  ],
+  "pdf_url": "https://www.law.go.kr/LSW/lsPdfPrint.do?ancYnChk=&bylChaChk=N&efGubun=Y&efYd=19660315&joAllCheck=Y&joEfOutPutYn=on&lsiSeq=15808&mokChaChk=N"
+}
