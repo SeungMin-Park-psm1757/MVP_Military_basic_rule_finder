@@ -32,7 +32,7 @@ SOURCE_TYPE_LABELS = {
     "law_text": "현행 조문",
     "revision_reason": "개정 이유",
     "old_new_comparison": "신구 비교",
-    "history_note": "연혁 메모",
+    "history_note": "연혁 자료",
 }
 
 FILTER_GROUP_ORDER = ["법령", "개정이유", "신구 비교", "기타"]
@@ -271,6 +271,42 @@ def inject_styles() -> None:
             font-weight: 700;
             margin: 1rem 0 0.15rem 0;
         }
+
+        div[data-testid="stChatMessageContent"] .stMarkdown h2 {
+            color: var(--ink);
+            font-size: 1.32rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin: 1.2rem 0 0.55rem 0;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid rgba(23, 33, 43, 0.10);
+        }
+
+        div[data-testid="stChatMessageContent"] .stMarkdown h3 {
+            color: var(--accent);
+            font-size: 1.02rem;
+            font-weight: 800;
+            margin: 0.9rem 0 0.35rem 0;
+        }
+
+        div[data-testid="stChatMessageContent"] .stMarkdown h4 {
+            color: var(--ink);
+            font-size: 0.96rem;
+            font-weight: 700;
+            margin: 0.8rem 0 0.25rem 0;
+            padding-left: 0.65rem;
+            border-left: 3px solid rgba(138, 106, 67, 0.30);
+        }
+
+        div[data-testid="stChatMessageContent"] .stMarkdown p,
+        div[data-testid="stChatMessageContent"] .stMarkdown li {
+            line-height: 1.72;
+        }
+
+        div[data-testid="stChatMessageContent"] .stMarkdown ul {
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -400,7 +436,7 @@ def render_intro() -> None:
         """
         <div class="masthead">
             <div class="masthead-title">군인의 지위 및 복무에 관한 기본법 챗봇</div>
-            <div class="masthead-copy">현행 조문, 개정 이유, 신구 비교, 연혁 메모를 근거로 답합니다.</div>
+            <div class="masthead-copy">현행 조문, 개정 이유, 신구 비교, 연혁 자료를 근거로 답합니다.</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -441,7 +477,7 @@ def render_evidence_card(hit: SearchHit, preview_chars: int) -> None:
         )
     )
 
-    text = chunk.text.strip()
+    text = str(chunk.extra.get("display_text") or chunk.extra.get("summary_text") or chunk.text).strip()
     if len(text) > preview_chars:
         text = text[:preview_chars] + "..."
     st.write(text)
@@ -469,7 +505,8 @@ def render_grouped_evidence(hits: list[SearchHit], preview_chars: int) -> None:
 
 def build_evidence_summary_line(hit: SearchHit, index: int) -> str:
     chunk = hit.chunk
-    preview = " ".join(chunk.text.strip().replace("데모용 요약:", "").split())
+    preview_source = str(chunk.extra.get("display_text") or chunk.extra.get("summary_text") or chunk.text)
+    preview = " ".join(preview_source.strip().replace("데모용 요약:", "").split())
     if len(preview) > 170:
         preview = preview[:167].rstrip() + "..."
     article_ref = " ".join(part for part in [chunk.article_no, chunk.article_title] if part).strip()

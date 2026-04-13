@@ -33,6 +33,44 @@ NOISY_TOKENS = [
     "주소복사",
 ]
 
+TIMELINE_QUESTION_KEYWORDS = ["연혁", "변천", "변천사", "흐름", "이어졌"]
+GENERIC_FOCUS_STOPWORDS = {
+    "개정",
+    "이유",
+    "설명",
+    "설명해줘",
+    "찾아줘",
+    "현행",
+    "규정",
+    "현재",
+    "무슨",
+    "내용",
+    "실무",
+    "참고",
+    "주의",
+    "과거",
+    "이전",
+    "예전",
+    "연혁",
+    "변천",
+    "변천사",
+    "흐름",
+    "군인의",
+    "지위",
+    "복무",
+    "기본법",
+    "시행령",
+    "시행규칙",
+    "관련",
+    "알려줘",
+}
+FOCUS_TERM_EXPANSIONS = {
+    "징계": ["징계", "징계혐의자", "징계조치", "불이익조치", "신고자 보호", "가혹행위", "상벌", "군기강"],
+    "휴가": ["휴가", "외출", "외박", "연가", "청원휴가", "특별휴가", "정기휴가", "휴가 보류"],
+    "고충": ["고충", "고충심사", "재심청구"],
+    "신고": ["신고", "신고자", "신고자 보호", "불이익조치", "가혹행위"],
+}
+
 
 @dataclass(slots=True)
 class GeneratedAnswer:
@@ -67,41 +105,41 @@ class GeminiAnswerClient:
             "휴직",
             "복무규율",
             "군인복무규율",
+            "징계",
+            "신고자 보호",
+            "가혹행위",
+            "불이익조치",
+            "상벌",
+            "고충심사",
         ]
         terms = [keyword for keyword in preferred if keyword in question]
         tokens = re.findall(r"[가-힣A-Za-z0-9]+", question)
-        stopwords = {
-            "개정",
-            "이유",
-            "설명",
-            "설명해줘",
-            "찾아줘",
-            "현행",
-            "규정",
-            "현재",
-            "무슨",
-            "내용",
-            "실무",
-            "참고",
-            "주의",
-            "과거",
-            "이전",
-            "예전",
-            "연혁",
-            "변천",
-            "발전",
-            "군인의",
-            "지위",
-            "복무",
-            "기본법",
-            "시행령",
-            "시행규칙",
-        }
         for token in tokens:
-            if len(token) < 2 or token in stopwords or token in terms:
+            if len(token) < 2 or token in GENERIC_FOCUS_STOPWORDS or token in terms:
                 continue
             terms.append(token)
-        return terms[:8]
+        expanded_terms: list[str] = []
+        for term in terms:
+            if term not in expanded_terms:
+                expanded_terms.append(term)
+            for key, synonyms in FOCUS_TERM_EXPANSIONS.items():
+                if term == key or term in synonyms:
+                    for synonym in synonyms:
+                        if synonym not in expanded_terms:
+                            expanded_terms.append(synonym)
+        return expanded_terms[:12]
+
+    def _is_timeline_question(self, question: str) -> bool:
+        return any(keyword in question for keyword in TIMELINE_QUESTION_KEYWORDS)
+
+    def _collapse_repeated_phrase(self, text: str) -> str:
+        compact = " ".join(text.split())
+        parts = compact.split()
+        if len(parts) >= 2 and len(parts) % 2 == 0:
+            halfway = len(parts) // 2
+            if parts[:halfway] == parts[halfway:]:
+                return " ".join(parts[:halfway])
+        return compact
 
     def _normalize_text(self, text: str) -> str:
         cleaned = text.replace("\u00a0", " ").strip()
@@ -110,17 +148,27 @@ class GeminiAnswerClient:
         cleaned = re.sub(r"\[[^\]]+\]", " ", cleaned)
         cleaned = re.sub(r"<[^>]+>", " ", cleaned)
         cleaned = re.sub(r"\s+", " ", cleaned).strip()
-        return cleaned
+        return self._collapse_repeated_phrase(cleaned)
 
     def _trim_sentence(self, text: str, *, limit: int = 150) -> str:
         compact = " ".join(text.split())
         if len(compact) <= limit:
             return compact
+        candidate = compact[:limit]
+        sentence_boundary = max(candidate.rfind(". "), candidate.rfind("다. "), candidate.rfind("; "))
+        if sentence_boundary >= int(limit * 0.55):
+            trimmed = candidate[: sentence_boundary + 1].rstrip(" ,")
+            if trimmed.endswith("."):
+                return trimmed
+            return trimmed + "."
         truncated = compact[: limit - 1]
         last_space = truncated.rfind(" ")
         if last_space >= 0:
             truncated = truncated[:last_space]
-        return truncated.rstrip(" ,") + "."
+        return truncated.rstrip(" ,") + "..."
+
+    def _hit_text(self, hit: SearchHit) -> str:
+        return str(hit.chunk.extra.get("summary_text") or hit.chunk.extra.get("display_text") or hit.chunk.text)
 
     def _extract_points(self, text: str, *, focus_terms: list[str], limit: int = 3) -> list[str]:
         raw_lines = []
@@ -171,14 +219,51 @@ class GeminiAnswerClient:
     def _source_hits(self, evidence: list[SearchHit], source_type: str) -> list[SearchHit]:
         return [hit for hit in evidence if hit.chunk.source_type == source_type]
 
+    def _scope_label(self, hit: SearchHit) -> str:
+        scope = str(hit.chunk.extra.get("scope", "")).strip()
+        return scope or hit.chunk.version_label or self._article_ref(hit)
+
+    def _expected_headings(self, question: str, intent: str) -> list[str]:
+        if intent == "explain_change" and self._is_timeline_question(question):
+            return [
+                "## 답변 개요",
+                "### 핵심 결론",
+                "## 연혁 정리",
+                "### 시기별 변화",
+                "## 현재 체계",
+                "### 현재 체계와 연결",
+                "## 근거 안내",
+                "### 확인 방법",
+            ]
+        if intent == "search":
+            return ["## 답변 개요", "### 핵심 결론", "## 세부 정리", "### 주요 규정", "### 실무 참고", "## 근거 안내", "### 확인 방법"]
+        if intent == "explain_change":
+            return [
+                "## 답변 개요",
+                "### 핵심 결론",
+                "## 세부 정리",
+                "### 주요 개정 이유",
+                "### 실제 제도 변화",
+                "### 해석 시사점",
+                "## 근거 안내",
+                "### 확인 방법",
+            ]
+        if intent == "practical":
+            return ["## 답변 개요", "### 핵심 결론", "## 실무 정리", "### 실무적으로 보면", "### 주의사항", "## 근거 안내", "### 확인 방법"]
+        return ["## 답변 개요", "### 핵심 결론", "## 세부 정리", "### 주요 개정 이유", "### 실무적으로 보면", "## 근거 안내", "### 확인 방법"]
+
+    def _is_structured_answer(self, question: str, intent: str, text: str) -> bool:
+        expected = self._expected_headings(question, intent)
+        return all(heading in text for heading in expected)
+
     def _line_for_hit(self, hit: SearchHit, *, focus_terms: list[str], max_points: int = 2) -> str:
-        points = self._extract_points(hit.chunk.text, focus_terms=focus_terms, limit=max_points)
+        points = self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=max_points)
         body = " ".join(points) if points else "현재 자료 기준으로 관련 내용을 요약하기 어렵습니다."
         return f"- {self._display_law_level(hit)} {self._article_ref(hit)}: {body}"
 
     def _reason_summary_points(self, reason_hits: list[SearchHit], focus_terms: list[str]) -> list[str]:
         points: list[str] = []
-        combined = " ".join(self._normalize_text(hit.chunk.text) for hit in reason_hits)
+        combined = " ".join(self._normalize_text(self._hit_text(hit)) for hit in reason_hits)
         if "출산" in combined:
             points.append("출산·돌봄 지원 확대가 주요 개정 배경으로 확인됩니다.")
         if "일·가정 양립" in combined or "양립" in combined:
@@ -187,7 +272,7 @@ class GeminiAnswerClient:
             points.append("복무 여건과 근무 환경을 보완하려는 목적이 함께 확인됩니다.")
 
         for hit in reason_hits:
-            for item in self._extract_points(hit.chunk.text, focus_terms=focus_terms, limit=2):
+            for item in self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=2):
                 if item not in points:
                     points.append(item)
                 if len(points) >= 3:
@@ -196,7 +281,7 @@ class GeminiAnswerClient:
 
     def _history_link_points(self, history_hits: list[SearchHit], focus_terms: list[str]) -> list[str]:
         points: list[str] = []
-        combined = " ".join(self._normalize_text(hit.chunk.text) for hit in history_hits)
+        combined = " ".join(self._normalize_text(self._hit_text(hit)) for hit in history_hits)
         if "군인복무규율" in combined:
             points.append(
                 "현재 기본법과 관련 시행령·시행규칙은 군인복무규율 체계에서 발전한 관계에 있으며, 기본 원칙은 법률로, 세부 기준은 하위 법령으로 재구성되었습니다."
@@ -207,7 +292,7 @@ class GeminiAnswerClient:
             )
 
         for hit in history_hits:
-            for item in self._extract_points(hit.chunk.text, focus_terms=focus_terms, limit=2):
+            for item in self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=2):
                 if item not in points:
                     points.append(item)
                 if len(points) >= 3:
@@ -217,18 +302,31 @@ class GeminiAnswerClient:
     def _change_points(self, compare_hits: list[SearchHit], law_hits: list[SearchHit], focus_terms: list[str]) -> list[str]:
         points: list[str] = []
         for hit in compare_hits:
-            for item in self._extract_points(hit.chunk.text, focus_terms=focus_terms, limit=3):
+            for item in self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=3):
                 if item not in points:
                     points.append(item)
                 if len(points) >= 3:
                     return points[:3]
         for hit in law_hits:
-            for item in self._extract_points(hit.chunk.text, focus_terms=focus_terms, limit=1):
+            for item in self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=1):
                 if item not in points:
                     points.append(item)
                 if len(points) >= 3:
                     return points[:3]
         return points[:3]
+
+    def _timeline_entry_markdown(self, hit: SearchHit, *, focus_terms: list[str]) -> str:
+        when = hit.chunk.effective_date or hit.chunk.promulgation_date or "시기 미상"
+        summary_points = self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=1)
+        summary = summary_points[0] if summary_points else "현재 자료 기준으로 핵심 내용을 추려 적기 어렵습니다."
+        title = f"{when} | {hit.chunk.law_name} | {self._scope_label(hit)}"
+        return f"#### {title}\n- {summary}"
+
+    def _current_link_markdown(self, hit: SearchHit, *, focus_terms: list[str]) -> str:
+        summary_points = self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=1)
+        summary = summary_points[0] if summary_points else "현재 자료 기준으로 핵심 내용을 추려 적기 어렵습니다."
+        title = f"{hit.chunk.law_name} {self._article_ref(hit)}"
+        return f"#### {title}\n- {summary}"
 
     def _conclusion_from_search(self, question: str, law_hits: list[SearchHit]) -> str:
         if not law_hits:
@@ -245,12 +343,18 @@ class GeminiAnswerClient:
         question: str,
         reason_hits: list[SearchHit],
         history_hits: list[SearchHit],
+        law_hits: list[SearchHit],
     ) -> str:
-        if not reason_hits and not history_hits:
+        if not reason_hits and not history_hits and not law_hits:
             return "현재 자료 기준으로 개정 이유나 연혁을 직접 설명할 만한 자료가 충분하지 않습니다."
-        history_combined = " ".join(self._normalize_text(hit.chunk.text) for hit in history_hits)
-        combined = " ".join(self._normalize_text(hit.chunk.text) for hit in reason_hits)
+        history_combined = " ".join(self._normalize_text(self._hit_text(hit)) for hit in history_hits)
+        combined = " ".join(self._normalize_text(self._hit_text(hit)) for hit in reason_hits + law_hits)
         focus_terms = self._question_focus_terms(question)
+        if "징계" in focus_terms and ("징계혐의자" in combined or "불이익조치" in combined or "신고자 보호" in combined):
+            return (
+                "현재 자료 기준으로 보면, 과거 군인복무규율의 군기·징계혐의자 관리 중심 표현에서 "
+                "기본법 제정 이후에는 기본권 침해 방지와 신고자 보호까지 법률 단계에서 직접 다루는 방향으로 이동했습니다."
+            )
         if "군인복무규율" in history_combined:
             return "현재 자료를 보면, 군인복무규율 체계에서 기본법과 관련 시행령·시행규칙 체계로 발전한 흐름 속에서 해당 기준이 정비되었습니다."
         if "출산" in combined and ("육아시간" in focus_terms or "돌봄휴가" in "".join(focus_terms)):
@@ -287,9 +391,9 @@ class GeminiAnswerClient:
             main_lines = ["- 현재 자료 기준으로 관련 현행 조문을 충분히 찾지 못했습니다."]
 
         apply_points: list[str] = []
-        if any("제2조의6" in self._article_ref(hit) or "5분의 1" in hit.chunk.text for hit in law_hits):
+        if any("제2조의6" in self._article_ref(hit) or "5분의 1" in self._hit_text(hit) for hit in law_hits):
             apply_points.append("휴가 확인 범위는 부대 현재 병력의 5분의 1 이내 기준이 시행령에 제시됩니다.")
-        if any("육아시간" in hit.chunk.text or "돌봄휴가" in hit.chunk.text for hit in law_hits):
+        if any("육아시간" in self._hit_text(hit) or "돌봄휴가" in self._hit_text(hit) for hit in law_hits):
             apply_points.append("돌봄·육아 관련 질문은 휴가 조문뿐 아니라 시행령 제2조 계열 세부 기준까지 함께 보는 것이 안전합니다.")
         if reason_hits and ("휴가" in focus_terms or "육아시간" in focus_terms or "돌봄휴가" in focus_terms):
             reason_points = self._reason_summary_points(reason_hits, focus_terms)
@@ -299,10 +403,13 @@ class GeminiAnswerClient:
             apply_points.append("현행 조문과 시행령을 함께 대조해 휴가 종류, 일수, 제한 사유, 확인 범위를 직접 확인하는 방식이 적절합니다.")
 
         return (
+            "## 답변 개요\n"
             f"### 핵심 결론\n{self._conclusion_from_search(question, law_hits)}\n\n"
+            "## 세부 정리\n"
             f"### 주요 규정\n" + "\n".join(main_lines) + "\n\n"
             f"### 실무 참고\n" + "\n".join(f"- {point}" if not point.startswith("- ") else point for point in apply_points[:3]) + "\n\n"
-            "### 근거\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
+            "## 근거 안내\n"
+            "### 확인 방법\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
         )
 
     def _build_explain_answer(self, question: str, evidence: list[SearchHit]) -> str:
@@ -311,6 +418,8 @@ class GeminiAnswerClient:
         history_hits = self._source_hits(evidence, "history_note")
         law_hits = self._source_hits(evidence, "law_text")
         focus_terms = self._question_focus_terms(question)
+        if self._is_timeline_question(question):
+            return self._build_timeline_answer(question, evidence)
 
         reason_points = self._reason_summary_points(reason_hits, focus_terms)
         history_points = self._history_link_points(history_hits, focus_terms)
@@ -328,7 +437,7 @@ class GeminiAnswerClient:
             change_points = ["현재 자료 기준으로 구체적인 변경 내용을 충분히 추리기 어렵습니다."]
 
         interpretation_points: list[str] = []
-        combined = " ".join(self._normalize_text(hit.chunk.text) for hit in reason_hits)
+        combined = " ".join(self._normalize_text(self._hit_text(hit)) for hit in reason_hits)
         if "출산" in combined:
             interpretation_points.append("출산·돌봄 지원을 확대하기 위한 개정으로 해석할 수 있습니다.")
         if "일·가정 양립" in combined or "양립" in combined:
@@ -342,11 +451,14 @@ class GeminiAnswerClient:
             interpretation_points.append("현재 자료 기준으로는 제도 범위와 운영 기준을 보완하려는 방향으로 해석됩니다.")
 
         return (
-            f"### 핵심 결론\n{self._conclusion_from_explain(question, reason_hits, history_hits)}\n\n"
+            "## 답변 개요\n"
+            f"### 핵심 결론\n{self._conclusion_from_explain(question, reason_hits, history_hits, law_hits)}\n\n"
+            "## 세부 정리\n"
             f"### 주요 개정 이유\n" + "\n".join(f"- {point}" for point in reason_points[:3]) + "\n\n"
             f"### 실제 제도 변화\n" + "\n".join(f"- {point}" for point in change_points[:3]) + "\n\n"
             f"### 해석 시사점\n" + "\n".join(f"- {point}" for point in interpretation_points[:3]) + "\n\n"
-            "### 근거\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
+            "## 근거 안내\n"
+            "### 확인 방법\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
         )
 
     def _build_practical_answer(self, question: str, evidence: list[SearchHit]) -> str:
@@ -358,7 +470,7 @@ class GeminiAnswerClient:
             practical_points.append("먼저 법률 조문에서 보장 범위와 제한 사유를 확인하고, 이어서 시행령에서 종류·일수·시간 범위를 확인하는 순서가 적절합니다.")
         if any("제8조" in self._article_ref(hit) for hit in law_hits):
             practical_points.append("휴가 제한이나 보류 사유는 작전상황, 교육훈련, 징계·형사 절차, 부대병력 유지 필요 여부까지 함께 점검해야 합니다.")
-        if any("5분의 1" in hit.chunk.text or "확인 범위" in hit.chunk.text for hit in law_hits):
+        if any("5분의 1" in self._hit_text(hit) or "확인 범위" in self._hit_text(hit) for hit in law_hits):
             practical_points.append("휴가 확인 범위는 부대 병력 상황에 따라 조정될 수 있으므로 시행령 기준과 부대 운용 상황을 함께 봐야 합니다.")
         if any(term in "".join(focus_terms) for term in ["육아시간", "돌봄휴가", "청원휴가"]):
             practical_points.append("돌봄·육아 관련 사안은 대상 요건, 사용 기간, 시간 단위 기준을 시행령 조문까지 같이 확인하는 것이 안전합니다.")
@@ -371,15 +483,19 @@ class GeminiAnswerClient:
         ]
 
         return (
+            "## 답변 개요\n"
             f"### 핵심 결론\n{self._conclusion_from_practical(law_hits)}\n\n"
+            "## 실무 정리\n"
             f"### 실무적으로 보면\n" + "\n".join(f"- {point}" for point in practical_points[:4]) + "\n\n"
             f"### 주의사항\n" + "\n".join(f"- {point}" for point in caution_points) + "\n\n"
-            "### 근거\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
+            "## 근거 안내\n"
+            "### 확인 방법\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
         )
 
     def _build_hybrid_answer(self, question: str, evidence: list[SearchHit]) -> str:
         reason_hits = self._source_hits(evidence, "revision_reason")
         history_hits = self._source_hits(evidence, "history_note")
+        law_hits = self._source_hits(evidence, "law_text")
         focus_terms = self._question_focus_terms(question)
         reason_points = self._reason_summary_points(reason_hits, focus_terms)
         history_points = self._history_link_points(history_hits, focus_terms)
@@ -393,10 +509,89 @@ class GeminiAnswerClient:
         practical_body = practical_answer.split("### 실무적으로 보면\n", 1)[-1].split("\n\n### 주의사항", 1)[0].strip()
 
         return (
-            f"### 핵심 결론\n{self._conclusion_from_explain(question, reason_hits, history_hits)}\n\n"
+            "## 답변 개요\n"
+            f"### 핵심 결론\n{self._conclusion_from_explain(question, reason_hits, history_hits, law_hits)}\n\n"
+            "## 세부 정리\n"
             f"### 주요 개정 이유\n" + "\n".join(f"- {point}" for point in reason_points[:3]) + "\n\n"
             f"### 실무적으로 보면\n{practical_body}\n\n"
-            "### 근거\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
+            "## 근거 안내\n"
+            "### 확인 방법\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
+        )
+
+    def _build_timeline_answer(self, question: str, evidence: list[SearchHit]) -> str:
+        focus_terms = self._question_focus_terms(question)
+        relevant_hits = sorted(
+            evidence,
+            key=lambda hit: (
+                hit.chunk.effective_date or hit.chunk.promulgation_date or "9999-12-31",
+                0 if hit.chunk.law_name == "군인복무규율" else 1,
+                0 if hit.chunk.source_type == "revision_reason" else 1,
+            ),
+        )
+
+        chronology_blocks: list[str] = []
+        seen_scopes: set[tuple[str, str, str]] = set()
+        for hit in relevant_hits:
+            summary_points = self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=1)
+            if not summary_points:
+                continue
+            key = (hit.chunk.law_name, self._scope_label(hit), hit.chunk.source_type)
+            if key in seen_scopes:
+                continue
+            seen_scopes.add(key)
+            chronology_blocks.append(self._timeline_entry_markdown(hit, focus_terms=focus_terms))
+            if len(chronology_blocks) >= 4:
+                break
+        if not chronology_blocks:
+            chronology_blocks = ["- 현재 자료 기준으로 시기별 변화를 직접 추적할 근거가 충분하지 않습니다."]
+
+        current_lines: list[str] = []
+        history_hits = self._source_hits(evidence, "history_note")
+        law_hits = [
+            hit
+            for hit in self._source_hits(evidence, "law_text")
+            if hit.chunk.law_name == "군인의 지위 및 복무에 관한 기본법"
+        ]
+        reason_hits = [
+            hit
+            for hit in self._source_hits(evidence, "revision_reason")
+            if hit.chunk.law_name == "군인의 지위 및 복무에 관한 기본법"
+        ]
+
+        history_combined = " ".join(self._normalize_text(self._hit_text(hit)) for hit in history_hits)
+        if "징계" in focus_terms and "군인복무규율" in history_combined and law_hits:
+            current_lines.append(
+                "#### 연결 요약\n- 군인복무규율에서 보이던 징계혐의자·휴가 보류 중심 기준이 현재는 기본법상 신고자 보호, "
+                "가혹행위 대응, 상담 지원 조문으로 재구성되어 권리보호 기준이 법률 단계에서 직접 드러납니다."
+            )
+        elif "군인복무규율" in history_combined and law_hits:
+            current_lines.append(
+                "#### 연결 요약\n- 군인복무규율의 복무관리 기준이 현재 기본법 조문과 하위 법령 체계로 재배치되면서, "
+                "핵심 원칙은 법률에 두고 세부 운영은 하위 법령으로 나누는 구조가 더 분명해졌습니다."
+            )
+
+        prioritized_current_hits = law_hits + reason_hits
+        for hit in prioritized_current_hits:
+            summary_points = self._extract_points(self._hit_text(hit), focus_terms=focus_terms, limit=1)
+            if not summary_points:
+                continue
+            line = self._current_link_markdown(hit, focus_terms=focus_terms)
+            if line not in current_lines:
+                current_lines.append(line)
+            if len(current_lines) >= 3:
+                break
+        if not current_lines:
+            current_lines.append("- 현재 자료 기준으로 기본법 단계에서 직접 확인되는 조문은 제한적입니다.")
+
+        return (
+            "## 답변 개요\n"
+            f"### 핵심 결론\n{self._conclusion_from_explain(question, reason_hits, history_hits, law_hits)}\n\n"
+            "## 연혁 정리\n"
+            f"### 시기별 변화\n" + "\n\n".join(chronology_blocks) + "\n\n"
+            "## 현재 체계\n"
+            f"### 현재 체계와 연결\n" + "\n\n".join(current_lines[:3]) + "\n\n"
+            "## 근거 안내\n"
+            "### 확인 방법\n- 아래 근거 카드와 원문 링크를 함께 확인해 주세요."
         )
 
     def _fallback_answer(self, question: str, intent: str, evidence: list[SearchHit]) -> str:
@@ -442,24 +637,33 @@ class GeminiAnswerClient:
     def _no_evidence_answer(self, intent: str) -> str:
         if intent == "explain_change":
             return (
+                "## 답변 개요\n"
                 "### 핵심 결론\n현재 자료 기준으로 개정 이유나 연혁을 충분히 찾지 못했습니다.\n\n"
+                "## 세부 정리\n"
                 "### 주요 개정 이유\n- 관련 개정이유 또는 신구 비교 자료가 부족합니다.\n\n"
                 "### 실제 제도 변화\n- 구체적인 변경 내용을 확인할 근거가 충분하지 않습니다.\n\n"
                 "### 해석 시사점\n- 질문을 더 구체화하거나 자료 유형을 조정해 다시 검색해 주세요.\n\n"
-                "### 근거\n- 현재 제시할 근거가 없습니다."
+                "## 근거 안내\n"
+                "### 확인 방법\n- 현재 제시할 근거가 없습니다."
             )
         if intent == "practical":
             return (
+                "## 답변 개요\n"
                 "### 핵심 결론\n현재 자료 기준으로 실무 참고에 필요한 근거가 부족합니다.\n\n"
+                "## 실무 정리\n"
                 "### 실무적으로 보면\n- 질문 범위를 더 좁혀 다시 검색하는 것이 좋습니다.\n\n"
                 "### 주의사항\n- 관련 조문과 시행령을 확인할 수 있는 공개 자료가 더 필요합니다.\n\n"
-                "### 근거\n- 현재 제시할 근거가 없습니다."
+                "## 근거 안내\n"
+                "### 확인 방법\n- 현재 제시할 근거가 없습니다."
             )
         return (
+            "## 답변 개요\n"
             "### 핵심 결론\n현재 자료 기준으로 관련 현행 규정을 충분히 찾지 못했습니다.\n\n"
+            "## 세부 정리\n"
             "### 주요 규정\n- 관련 조문이 충분히 검색되지 않았습니다.\n\n"
             "### 실무 참고\n- 질문을 더 구체화하거나 자료 유형을 조정해 다시 검색해 주세요.\n\n"
-            "### 근거\n- 현재 제시할 근거가 없습니다."
+            "## 근거 안내\n"
+            "### 확인 방법\n- 현재 제시할 근거가 없습니다."
         )
 
     def generate_answer(
@@ -534,6 +738,14 @@ class GeminiAnswerClient:
                     intent=intent,
                     evidence=evidence,
                     notice="Gemini 응답 본문이 비어 있어 근거 기반 요약으로 전환했습니다.",
+                    quota_snapshot=updated_snapshot,
+                )
+            if not self._is_structured_answer(question, intent, final_text):
+                return self._fallback_result(
+                    question=question,
+                    intent=intent,
+                    evidence=evidence,
+                    notice="Gemini 응답이 지정한 형식을 충분히 따르지 않아 근거 기반 요약으로 전환했습니다.",
                     quota_snapshot=updated_snapshot,
                 )
 

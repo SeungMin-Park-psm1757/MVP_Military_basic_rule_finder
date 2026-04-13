@@ -102,3 +102,44 @@ def test_history_question_adds_related_military_service_rules_hit(tmp_path):
     )
 
     assert any("군인복무규율" in hit.chunk.law_name or "군인복무규율" in hit.chunk.text for hit in hits)
+
+
+def test_timeline_question_prefers_target_law_and_predecessor_hits(tmp_path):
+    settings = make_settings(tmp_path)
+    store = ChromaStore(settings)
+    store.upsert(
+        [
+            make_chunk(
+                "basic-reason",
+                "revision_reason",
+                "군 내 기본권 침해를 줄이고 신고한 군인을 보호하기 위해 징계조치 등 불이익조치를 금지하는 방향으로 제정되었다.",
+                law_name="군인의 지위 및 복무에 관한 기본법",
+            ),
+            make_chunk(
+                "basic-law",
+                "law_text",
+                "신고자에게 징계조치 등 어떠한 신분상 불이익도 주어서는 아니 된다.",
+                law_name="군인의 지위 및 복무에 관한 기본법",
+            ),
+            make_chunk(
+                "legacy-history",
+                "history_note",
+                "군인복무규율에서는 징계혐의자를 외출·외박 및 휴가 보류 대상으로 직접 적시하였다.",
+                law_name="군인복무규율",
+            ),
+            make_chunk(
+                "irrelevant-decree",
+                "law_text",
+                "비상소집은 국가비상사태가 발생한 때에 발령한다.",
+                law_name="군인의 지위 및 복무에 관한 기본법 시행령",
+            ),
+        ]
+    )
+    service = AnswerService(settings, store=store)
+
+    intent, _, hits = service.retrieve("징계 관련 기본법 변천사를 알려줘")
+
+    assert intent == "explain_change"
+    assert any(hit.chunk.law_name == "군인의 지위 및 복무에 관한 기본법" for hit in hits)
+    assert any(hit.chunk.law_name == "군인복무규율" for hit in hits)
+    assert all("비상소집" not in hit.chunk.text for hit in hits)

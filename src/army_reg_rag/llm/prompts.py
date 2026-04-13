@@ -6,41 +6,68 @@ from army_reg_rag.domain.models import SearchHit
 SYSTEM_PROMPT = """당신은 공개 법규 기반의 군 복무 규정 RAG 보조 도구입니다.
 반드시 아래 원칙을 지키세요.
 1) 사용자 질문에 바로 답하고, 근거 없는 일반론으로 메우지 마세요.
-2) 현행 법률, 시행령, 시행규칙, 개정이유, 신구비교, 연혁 메모를 구분해서 설명하세요.
+2) 현행 법률, 시행령, 시행규칙, 개정이유, 신구비교, 연혁 자료를 구분해서 설명하세요.
 3) 과거 내용이나 연혁 질문에서 근거에 군인복무규율이 나오면, 현재 기본법과 관련 시행령·시행규칙이 그 체계에서 발전한 관계임을 명시하세요.
 4) 법률 자문처럼 단정하지 말고, 근거 중심의 설명과 원문 확인 안내를 유지하세요.
 5) 근거가 부족하면 '현재 자료 기준'이라고 분명히 쓰세요.
 """
 
 
-def _output_format(intent: str) -> str:
+def _is_timeline_question(question: str) -> bool:
+    return any(keyword in question for keyword in ["연혁", "변천", "변천사", "흐름", "이어졌"])
+
+
+def _output_format(intent: str, question: str) -> str:
+    if intent == "explain_change" and _is_timeline_question(question):
+        return (
+            "## 답변 개요\n"
+            "### 핵심 결론\n"
+            "## 연혁 정리\n"
+            "### 시기별 변화\n"
+            "## 현재 체계\n"
+            "### 현재 체계와 연결\n"
+            "## 근거 안내\n"
+            "### 확인 방법"
+        )
     if intent == "search":
         return (
+            "## 답변 개요\n"
             "### 핵심 결론\n"
+            "## 세부 정리\n"
             "### 주요 규정\n"
             "### 실무 참고\n"
-            "### 근거"
+            "## 근거 안내\n"
+            "### 확인 방법"
         )
     if intent == "explain_change":
         return (
+            "## 답변 개요\n"
             "### 핵심 결론\n"
+            "## 세부 정리\n"
             "### 주요 개정 이유\n"
             "### 실제 제도 변화\n"
             "### 해석 시사점\n"
-            "### 근거"
+            "## 근거 안내\n"
+            "### 확인 방법"
         )
     if intent == "practical":
         return (
+            "## 답변 개요\n"
             "### 핵심 결론\n"
+            "## 실무 정리\n"
             "### 실무적으로 보면\n"
             "### 주의사항\n"
-            "### 근거"
+            "## 근거 안내\n"
+            "### 확인 방법"
         )
     return (
+        "## 답변 개요\n"
         "### 핵심 결론\n"
+        "## 세부 정리\n"
         "### 주요 개정 이유\n"
         "### 실무적으로 보면\n"
-        "### 근거"
+        "## 근거 안내\n"
+        "### 확인 방법"
     )
 
 
@@ -70,6 +97,9 @@ def build_user_prompt(question: str, intent: str, evidence: list[SearchHit]) -> 
         "hybrid": "개정 이유와 실무 참고가 함께 필요한 질문입니다. 연혁과 현재 적용 관점을 함께 정리하세요.",
     }.get(intent, "질문에 직접 답하세요.")
 
+    if intent == "explain_change" and _is_timeline_question(question):
+        guidance += " 특히 변천사 질문이면 시기순으로 정리하고, 주제어와 직접 연결되는 근거만 사용하세요."
+
     return f"""질문: {question}
 질문 유형: {intent}
 작성 지시: {guidance}
@@ -80,11 +110,15 @@ def build_user_prompt(question: str, intent: str, evidence: list[SearchHit]) -> 
 
 추가 작성 규칙:
 - 과거 내용 또는 연혁 질문에서 근거에 군인복무규율이 나오면, 현재 기본법과 시행령·시행규칙이 그 체계에서 발전한 관계임을 명시하세요.
-- 법률, 시행령, 시행규칙, 개정이유, 신구비교, 연혁 메모를 섞지 말고 구분해서 설명하세요.
+- 법률, 시행령, 시행규칙, 개정이유, 신구비교, 연혁 자료를 섞지 말고 구분해서 설명하세요.
+- 질문 주제와 직접 연결되는 근거만 사용하고, 무관한 조문은 억지로 끼워 넣지 마세요.
+- 변천사 질문이면 "군인복무규율 -> 기본법 제정 -> 이후 보완"처럼 시기 흐름을 드러내세요.
+- 문장을 중간에서 자르지 말고, 끝맺음이 어색하면 짧게 다시 정리하세요.
+- 제목은 `## 큰 제목 -> ### 작은 제목` 계층을 유지하세요.
 - 현행 규정 질문인데 개정 배경만 길게 설명하지 마세요.
 - 개정 이유 질문인데 단순 조문 요약만 하지 마세요.
 - 근거가 부족하면 '현재 자료 기준'이라고 쓰세요.
 
 출력 형식:
-{_output_format(intent)}
+{_output_format(intent, question)}
 """

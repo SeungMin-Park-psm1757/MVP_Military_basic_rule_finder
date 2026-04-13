@@ -45,6 +45,9 @@ HEADER_RE = re.compile(
 )
 ARTICLE_RE = re.compile(r"(?=(제\d+조(?:의\d+)?\s*\([^)]+\)))")
 SUPPLEMENTARY_RE = re.compile(r"(?=(부칙(?:\s*<[^>]+>)?))")
+REVISION_REASON_LINE_RE = re.compile(r"^◇\s*(제정이유|개정이유)\s*(.*)$")
+REVISION_MAIN_CONTENT_RE = re.compile(r"^◇\s*주요내용\s*(.*)$")
+REVISION_ITEM_RE = re.compile(r"^(?P<label>[가-하])\.\s*(?P<body>.+)$")
 
 
 @dataclass(slots=True)
@@ -132,6 +135,16 @@ def _request_with_retry(
 
 def _canonical_text(value: str) -> str:
     return " ".join(value.split())
+
+
+def _collapse_repeated_phrase(value: str) -> str:
+    compact = _canonical_text(value)
+    parts = compact.split()
+    if len(parts) >= 2 and len(parts) % 2 == 0:
+        halfway = len(parts) // 2
+        if parts[:halfway] == parts[halfway:]:
+            return " ".join(parts[:halfway])
+    return compact
 
 
 def _normalize_display_date(value: str) -> str:
@@ -298,11 +311,44 @@ def _law_level_for(law_name: str) -> str:
     return "법률"
 
 
-def _clean_text(text: str) -> str:
-    cleaned = text.replace("\x00", " ")
+def _drop_standalone_lines(text: str, patterns: list[str]) -> str:
+    cleaned = text
+    for pattern in patterns:
+        cleaned = re.sub(pattern, "", cleaned, flags=re.MULTILINE)
+    return cleaned
+
+
+def _normalize_wrapped_newlines(text: str) -> str:
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    normalized = re.sub(r"(?<=[가-힣A-Za-z0-9,·ㆍ])\n(?=[가-힣A-Za-z])", "", normalized)
+    normalized = re.sub(r"\n{3,}", "\n\n", normalized)
+    return normalized
+
+
+def _clean_text(text: str, *, law_name: str = "") -> str:
+    cleaned = text.replace("\x00", "").replace("\r\n", "\n").replace("\r", "\n")
     cleaned = re.sub(r"법제처\s+\d+\s+국가법령정보센\s*터", " ", cleaned)
+    cleaned = re.sub(r"\b([가-힣A-Za-z0-9·ㆍ\s]{4,80})\s+\1\b", r"\1", cleaned)
+    cleaned = _drop_standalone_lines(
+        cleaned,
+        [
+            r"^\s*제\d+장\s+[^\n]+\s*$",
+            r"^\s*제\d+절\s+[^\n]+\s*$",
+            r"^\s*제\d+관\s+[^\n]+\s*$",
+        ],
+    )
+    if law_name:
+        cleaned = _drop_standalone_lines(
+            cleaned,
+            [
+                rf"^\s*{re.escape(law_name)}\s*$",
+                rf"^\s*{re.escape(_collapse_repeated_phrase(law_name))}\s*$",
+            ],
+        )
+    cleaned = _normalize_wrapped_newlines(cleaned)
     cleaned = re.sub(r"\n\s+\n", "\n\n", cleaned)
     cleaned = re.sub(r"[ \t]+", " ", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
     return cleaned.strip()
 
 
@@ -314,6 +360,187 @@ def _pdf_text(path: Path) -> str:
 def _html_text(path: Path) -> str:
     soup = BeautifulSoup(path.read_text(encoding="utf-8"), "lxml")
     return _clean_text(soup.get_text("\n", strip=True))
+
+
+def _strip_article_heading(text: str, article_no: str, article_title: str) -> str:
+    if article_no == "부칙":
+        return text.strip()
+    cleaned = re.sub(
+        rf"^\s*{re.escape(article_no)}\s*\(\s*{re.escape(article_title)}\s*\)\s*",
+        "",
+        text.strip(),
+    )
+    return cleaned.strip()
+
+
+def _strip_revision_heading(text: str, law_name: str) -> str:
+    cleaned = text.strip()
+    cleaned = re.sub(r"^.*?【제정·개정이유】\s*", "", cleaned, flags=re.DOTALL)
+    cleaned = re.sub(r"^.*?【제정·개정문】\s*", "", cleaned, flags=re.DOTALL)
+    cleaned = re.sub(r"^\s*(전체\s*)?제정·개정이유(?:화면내검색)?\s*", "", cleaned)
+    cleaned = re.sub(r"^\s*(전체\s*)?제정·개정문(?:화면내검색)?\s*", "", cleaned)
+    cleaned = re.sub(
+        rf"^\s*{re.escape(law_name)}\s*\[시행 [^\]]+\]\s*\[[^\]]+\]\s*",
+        "",
+        cleaned,
+    )
+    cleaned = re.sub(r"^\s*【제정·개정이유】\s*", "", cleaned)
+    cleaned = re.sub(r"^\s*【제정·개정문】\s*", "", cleaned)
+    cleaned = re.sub(r"^\s*\[[^\]]+\]\s*", "", cleaned)
+    cleaned = re.split(r"<법제처 제공>|위로아래로검색|화면내검색 입력 폼", cleaned, maxsplit=1)[0]
+    cleaned = re.sub(r"(제정이유|개정이유|주요내용)(?=[가-힣])", r"\1 ", cleaned)
+    if cleaned.startswith("제정이유") or cleaned.startswith("개정이유"):
+        cleaned = f"◇ {cleaned}"
+    if "주요내용" in cleaned and "◇ 주요내용" not in cleaned:
+        cleaned = cleaned.replace("주요내용", "\n◇ 주요내용", 1)
+    cleaned = re.sub(r"\s*◇\s*", "\n◇ ", cleaned)
+    cleaned = re.sub(r"\s+(?=[가-하]\.\s)", "\n", cleaned)
+    cleaned = re.sub(r"\s+(?=\d+\)\s)", "\n", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    cleaned = re.sub(r"[ \t]+", " ", cleaned)
+    return cleaned.strip()
+
+
+def _truncate_preview(text: str, *, limit: int = 220) -> str:
+    compact = " ".join(text.split())
+    if len(compact) <= limit:
+        return compact
+
+    candidate = compact[:limit]
+    boundary = max(candidate.rfind(". "), candidate.rfind("다. "), candidate.rfind("; "))
+    if boundary >= int(limit * 0.55):
+        return candidate[: boundary + 1].rstrip(" ,")
+
+    truncated = compact[: limit - 1]
+    last_space = truncated.rfind(" ")
+    if last_space >= 0:
+        truncated = truncated[:last_space]
+    return truncated.rstrip(" ,") + "..."
+
+
+def _build_revision_display_text(summary_text: str) -> str:
+    lines = [line.strip() for line in summary_text.splitlines() if line.strip()]
+    if not lines:
+        return ""
+
+    reason_heading = ""
+    reason_parts: list[str] = []
+    content_points: list[str] = []
+    current_point = ""
+    in_main_content = False
+
+    for line in lines:
+        reason_match = REVISION_REASON_LINE_RE.match(line)
+        if reason_match:
+            reason_heading = reason_match.group(1)
+            first_body = reason_match.group(2).strip()
+            if first_body:
+                reason_parts.append(first_body)
+            in_main_content = False
+            continue
+
+        main_match = REVISION_MAIN_CONTENT_RE.match(line)
+        if main_match:
+            in_main_content = True
+            first_body = main_match.group(1).strip()
+            if first_body:
+                current_point = first_body
+            continue
+
+        item_match = REVISION_ITEM_RE.match(line)
+        if item_match:
+            if current_point:
+                content_points.append(current_point)
+            current_point = f"{item_match.group('label')}. {item_match.group('body').strip()}"
+            in_main_content = True
+            continue
+
+        if in_main_content:
+            if current_point:
+                current_point = f"{current_point} {line}".strip()
+            else:
+                current_point = line
+            continue
+
+        reason_parts.append(line)
+
+    if current_point:
+        content_points.append(current_point)
+
+    preview_lines: list[str] = []
+    if reason_parts:
+        label = reason_heading or "개정이유"
+        preview_lines.append(f"{label}: {_truncate_preview(' '.join(reason_parts), limit=230)}")
+
+    if content_points:
+        preview_lines.append("주요내용:")
+        for point in content_points[:3]:
+            preview_lines.append(f"- {_truncate_preview(point, limit=150)}")
+
+    if not preview_lines:
+        return _truncate_preview(summary_text, limit=320)
+
+    return "\n".join(preview_lines)
+
+
+def _split_revision_reason_chunks(summary_text: str) -> list[tuple[str, str]]:
+    lines = [line.strip() for line in summary_text.splitlines() if line.strip()]
+    if not lines:
+        return []
+
+    reason_heading = ""
+    reason_parts: list[str] = []
+    content_points: list[str] = []
+    current_point = ""
+    in_main_content = False
+
+    for line in lines:
+        reason_match = REVISION_REASON_LINE_RE.match(line)
+        if reason_match:
+            reason_heading = reason_match.group(1)
+            first_body = reason_match.group(2).strip()
+            if first_body:
+                reason_parts.append(first_body)
+            in_main_content = False
+            continue
+
+        main_match = REVISION_MAIN_CONTENT_RE.match(line)
+        if main_match:
+            in_main_content = True
+            first_body = main_match.group(1).strip()
+            if first_body:
+                current_point = first_body
+            continue
+
+        item_match = REVISION_ITEM_RE.match(line)
+        if item_match:
+            if current_point:
+                content_points.append(current_point)
+            current_point = f"{item_match.group('label')}. {item_match.group('body').strip()}"
+            in_main_content = True
+            continue
+
+        if in_main_content:
+            if current_point:
+                current_point = f"{current_point} {line}".strip()
+            else:
+                current_point = line
+            continue
+
+        reason_parts.append(line)
+
+    if current_point:
+        content_points.append(current_point)
+
+    chunks: list[tuple[str, str]] = []
+    if reason_parts:
+        title = reason_heading or "개정이유"
+        chunks.append((title, " ".join(reason_parts).strip()))
+    for point in content_points:
+        label_match = REVISION_ITEM_RE.match(point)
+        title = f"주요내용 {label_match.group('label')}" if label_match else "주요내용"
+        chunks.append((title, point))
+    return [(title, body) for title, body in chunks if body]
 
 
 def _chunk_large_text(text: str, *, max_chars: int = 2400, overlap: int = 220) -> list[str]:
@@ -415,16 +642,22 @@ def _record_id(*parts: str) -> str:
 def _build_records_for_law_text(metadata: dict[str, Any], pdf_path: Path) -> list[dict[str, Any]]:
     text = _pdf_text(pdf_path)
     header = _parse_header(text, fallback_law_name=str(metadata.get("law_name", "")))
+    canonical_law_name = _collapse_repeated_phrase(str(metadata.get("law_name", "")))
     records: list[dict[str, Any]] = []
 
     for index, (article_no, payload) in enumerate(_split_article_segments(text), start=1):
         first_line, body = (payload.split("\n", 1) + [""])[:2]
         article_title = "부칙" if article_no == "부칙" else first_line
+        body_text = _clean_text(
+            payload if article_no == "부칙" else _strip_article_heading(body, article_no, article_title),
+            law_name=canonical_law_name,
+        )
+        search_text = body_text if article_no == "부칙" else f"{article_title} {body_text}".strip()
         records.append(
             {
                 "id": _record_id(str(metadata.get("source_id")), article_no or f"segment-{index}"),
-                "law_name": header["law_name"] or str(metadata.get("law_name", "")),
-                "law_level": _law_level_for(str(metadata.get("law_name", ""))),
+                "law_name": canonical_law_name,
+                "law_level": _law_level_for(canonical_law_name),
                 "source_type": str(metadata.get("source_type", "")),
                 "version_label": header["version_label"] or str(metadata.get("scope", "")),
                 "promulgation_date": header["promulgation_date"],
@@ -432,10 +665,13 @@ def _build_records_for_law_text(metadata: dict[str, Any], pdf_path: Path) -> lis
                 "article_no": article_no,
                 "article_title": article_title,
                 "revision_kind": header["revision_kind"],
-                "text": _clean_text(payload if article_no == "부칙" else body),
+                "text": search_text,
                 "source_url": str(metadata.get("source_url", "")),
                 "scope": str(metadata.get("scope", "")),
                 "source_id": str(metadata.get("source_id", "")),
+                "display_source_type": "연혁 원문" if str(metadata.get("source_type", "")) == "history_note" else "",
+                "summary_text": body_text,
+                "display_text": body_text,
             }
         )
     return records
@@ -445,17 +681,36 @@ def _build_records_for_revision_like(metadata: dict[str, Any], html_path: Path) 
     text = _html_text(html_path)
     sections = _split_revision_sections(text)
     article_title = "제정·개정이유" if metadata.get("source_type") == "revision_reason" else "제정·개정문"
+    canonical_law_name = _collapse_repeated_phrase(str(metadata.get("law_name", "")))
     records: list[dict[str, Any]] = []
 
     for section_index, section in enumerate(sections, start=1):
         header = _parse_header(section, fallback_law_name=str(metadata.get("law_name", "")))
-        for chunk_index, chunk in enumerate(_chunk_large_text(section), start=1):
-            chunk_title = article_title if chunk_index == 1 else f"{article_title} ({chunk_index})"
+        section_text = _clean_text(section, law_name=canonical_law_name)
+        base_summary_text = _strip_revision_heading(section_text, canonical_law_name)
+        if metadata.get("source_type") == "revision_reason":
+            raw_chunks = _split_revision_reason_chunks(base_summary_text)
+        else:
+            raw_chunks = []
+
+        chunk_candidates = raw_chunks or [
+            (
+                article_title if chunk_index == 1 else f"{article_title} ({chunk_index})",
+                _clean_text(chunk, law_name=canonical_law_name),
+            )
+            for chunk_index, chunk in enumerate(_chunk_large_text(section), start=1)
+        ]
+
+        for chunk_index, (chunk_title, raw_chunk_text) in enumerate(chunk_candidates, start=1):
+            chunk_text = _clean_text(raw_chunk_text, law_name=canonical_law_name)
+            summary_text = _strip_revision_heading(chunk_text, canonical_law_name)
+            display_text = _build_revision_display_text(summary_text or chunk_text)
+            search_text = f"{chunk_title} {summary_text or chunk_text}".strip()
             records.append(
                 {
                     "id": _record_id(str(metadata.get("source_id")), str(section_index), str(chunk_index)),
-                    "law_name": header["law_name"] or str(metadata.get("law_name", "")),
-                    "law_level": _law_level_for(str(metadata.get("law_name", ""))),
+                    "law_name": canonical_law_name,
+                    "law_level": _law_level_for(canonical_law_name),
                     "source_type": str(metadata.get("source_type", "")),
                     "version_label": header["version_label"] or str(metadata.get("scope", "")),
                     "promulgation_date": header["promulgation_date"],
@@ -463,11 +718,13 @@ def _build_records_for_revision_like(metadata: dict[str, Any], html_path: Path) 
                     "article_no": "",
                     "article_title": chunk_title,
                     "revision_kind": header["revision_kind"],
-                    "text": chunk,
+                    "text": search_text,
                     "source_url": str(metadata.get("source_url", "")),
                     "scope": str(metadata.get("scope", "")),
                     "source_id": str(metadata.get("source_id", "")),
                     "section_index": section_index,
+                    "summary_text": summary_text or chunk_text,
+                    "display_text": display_text or summary_text or chunk_text,
                 }
             )
     return records

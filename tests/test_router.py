@@ -28,3 +28,8 @@ def test_history_route_prioritizes_history_sources():
     result = decide_route("과거 군인복무규율에서 휴가가 어떻게 이어졌는지 알려줘")
     assert result.intent == "explain_change"
     assert result.preferred_source_types[0] == "history_note"
+
+
+def test_history_route_handles_timeline_wording():
+    result = decide_route("징계 관련 기본법 변천사를 알려줘")
+    assert result.intent == "explain_change"

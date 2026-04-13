@@ -125,18 +125,25 @@ class _JsonFallbackStore:
             }
         self._save()
 
+    def _matches_where(self, metadata: dict, where: dict | None) -> bool:
+        if not where:
+            return True
+        if "$and" in where:
+            clauses = where.get("$and", [])
+            if not isinstance(clauses, list):
+                return False
+            return all(self._matches_where(metadata, clause) for clause in clauses)
+        for key, value in where.items():
+            if metadata.get(key) != value:
+                return False
+        return True
+
     def query(self, query_embedding: list[float], n_results: int, where: dict | None) -> dict:
         rows = []
         for doc_id, payload in self.records.items():
             metadata = payload.get("metadata", {})
-            if where:
-                ok = True
-                for key, value in where.items():
-                    if metadata.get(key) != value:
-                        ok = False
-                        break
-                if not ok:
-                    continue
+            if not self._matches_where(metadata, where):
+                continue
             score = _cosine_similarity(query_embedding, payload.get("embedding", []))
             rows.append((score, doc_id, payload.get("document", ""), metadata))
         rows.sort(key=lambda item: item[0], reverse=True)

@@ -156,3 +156,50 @@ def test_explain_fallback_mentions_military_service_rules_history(tmp_path):
     assert "군인복무규율" in answer.text
     assert "기본법" in answer.text
     assert "시행령" in answer.text
+
+
+def test_timeline_fallback_uses_chronology_sections(tmp_path):
+    client = GeminiAnswerClient(make_settings(tmp_path))
+    evidence = [
+        make_hit(
+            chunk_id="legacy-history",
+            law_name="군인복무규율",
+            law_level="대통령령",
+            source_type="history_note",
+            article_no="제42조",
+            article_title="외출ㆍ외박ㆍ휴가의 제한 및 보류",
+            text="징계혐의자는 외출ㆍ외박 및 휴가를 일시 보류할 수 있다고 규정하였다.",
+        ),
+        make_hit(
+            chunk_id="basic-reason",
+            law_name="군인의 지위 및 복무에 관한 기본법",
+            law_level="법률",
+            source_type="revision_reason",
+            article_no="",
+            article_title="제정·개정이유",
+            text="기본권 침해를 줄이고 신고한 군인을 보호하도록 하며 징계조치 등 불이익조치를 금지하는 방향으로 제정되었다.",
+        ),
+        make_hit(
+            chunk_id="basic-law",
+            law_name="군인의 지위 및 복무에 관한 기본법",
+            law_level="법률",
+            source_type="law_text",
+            article_no="제45조",
+            article_title="신고자 보호",
+            text="누구든지 신고를 이유로 신고자에게 징계조치 등 어떠한 신분상 불이익도 하여서는 아니 된다.",
+        ),
+    ]
+
+    answer = client.generate_answer(
+        "징계 관련 기본법 변천사를 알려줘.",
+        "explain_change",
+        evidence,
+        allow_generation=False,
+    )
+
+    assert "## 연혁 정리" in answer.text
+    assert "### 시기별 변화" in answer.text
+    assert "####" in answer.text
+    assert "### 현재 체계와 연결" in answer.text
+    assert "군인복무규율" in answer.text
+    assert "신고자 보호" in answer.text
