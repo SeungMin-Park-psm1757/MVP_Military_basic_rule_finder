@@ -91,3 +91,4 @@ class AnswerBundle:
     answer_backend: str = "retrieval_fallback"
     answer_notice: str = ""
     quota_snapshot: dict[str, Any] = field(default_factory=dict)
+    diagnostics: dict[str, Any] = field(default_factory=dict)

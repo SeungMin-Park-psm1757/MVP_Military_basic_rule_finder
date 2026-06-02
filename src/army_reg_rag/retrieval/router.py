@@ -18,7 +18,12 @@ EXPLAIN_KEYWORDS = [
     "취지",
     "이유",
     "바뀌었",
+    "달라졌",
+    "어떻게 달라졌",
+    "재편",
+    "폐지",
     "변경",
+    "변화",
     "개정",
 ]
 
@@ -35,6 +40,11 @@ HISTORY_KEYWORDS = [
     "유래",
     "발전",
     "넘어오",
+    "넘어오면서",
+    "체계로 오",
+    "재편",
+    "폐지",
+    "체계",
     "군인복무규율",
 ]
 
@@ -47,6 +57,10 @@ PRACTICAL_KEYWORDS = [
     "확인",
     "확인해야",
     "절차",
+    "담당",
+    "구분",
+    "종류",
+    "종류·절차",
 ]
 
 CURRENT_PRACTICAL_CUES = [
@@ -59,6 +73,28 @@ CURRENT_PRACTICAL_CUES = [
     "확인",
     "참고",
     "주의",
+    "담당",
+]
+
+TRANSITION_SPLIT_KEYWORDS = [
+    "폐지",
+    "재편",
+    "체계",
+    "담당",
+    "구분",
+    "종류·절차",
+    "종류와 절차",
+    "종류 및 절차",
+]
+
+DISCIPLINE_PROCEDURE_KEYWORDS = [
+    "징계의 종류",
+    "징계 종류",
+    "징계 절차",
+    "징계절차",
+    "징계위원회",
+    "군인사법",
+    "군인 징계령",
 ]
 
 
@@ -69,12 +105,29 @@ def decide_route(question: str) -> RouteDecision:
     has_history = any(keyword in q for keyword in HISTORY_KEYWORDS)
     has_practical = any(keyword in q for keyword in PRACTICAL_KEYWORDS)
     has_current_practical_cue = any(keyword in q for keyword in CURRENT_PRACTICAL_CUES)
+    has_transition_split = (
+        any(keyword in q for keyword in TRANSITION_SPLIT_KEYWORDS)
+        and ("군인복무규율" in q or has_history)
+        and any(keyword in q for keyword in [*DISCIPLINE_PROCEDURE_KEYWORDS, "현재", "현행", "담당"])
+    )
 
+    if has_transition_split:
+        return RouteDecision(
+            intent="hybrid",
+            preferred_source_types=["history_note", "revision_reason", "old_new_comparison", "law_text"],
+            rationale="군인복무규율 폐지 이후 재편 흐름과 현재 담당 법령 범위를 함께 묻는 질문으로 보고, 연혁·개정이유·현행 조문을 함께 조회합니다.",
+        )
     if (has_explain or has_history) and has_practical and has_current_practical_cue:
         return RouteDecision(
             intent="hybrid",
             preferred_source_types=["history_note", "revision_reason", "old_new_comparison", "law_text"],
             rationale="과거 연혁과 현재 실무 기준을 함께 묻는 질문으로 보고, 군인복무규율 연계 자료와 개정 자료를 함께 조회합니다.",
+        )
+    if (has_explain or has_history) and any(keyword in q for keyword in ["현행 조문", "현재 조문", "현행 규정", "함께 근거"]):
+        return RouteDecision(
+            intent="hybrid",
+            preferred_source_types=["history_note", "revision_reason", "old_new_comparison", "law_text"],
+            rationale="개정·연혁 설명과 현행 조문 근거를 함께 요구하는 질문으로 보고, 과거 자료와 현재 조문을 함께 조회합니다.",
         )
     if has_history:
         return RouteDecision(

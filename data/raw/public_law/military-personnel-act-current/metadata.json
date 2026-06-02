@@ -1,0 +1,14 @@
+{
+  "source_id": "military-personnel-act-current",
+  "law_name": "군인사법",
+  "scope": "현행 본문",
+  "source_type": "law_text",
+  "source_url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B5%B0%EC%9D%B8%EC%82%AC%EB%B2%95",
+  "notes": "징계 종류와 인사상 처분의 현행 법률 근거 확인용.",
+  "retrieved_at": "2026-04-21T00:49:50.786131+00:00",
+  "artifacts": [
+    "page.html",
+    "body.pdf"
+  ],
+  "pdf_url": "https://www.law.go.kr/LSW/lsPdfPrint.do?ancYnChk=0&bylChaChk=N&efGubun=Y&efYd=20260203&joAllCheck=Y&joEfOutPutYn=on&lsiSeq=283197&mokChaChk=N"
+}

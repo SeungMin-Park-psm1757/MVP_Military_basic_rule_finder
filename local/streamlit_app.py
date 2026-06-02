@@ -4,6 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 import sys
+from time import perf_counter
 from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -43,9 +44,9 @@ SOURCE_TYPE_LABELS = {
 }
 
 BACKEND_LABELS = {
-    "lm_studio": "LM Studio 로컬 생성",
-    "retrieval_fallback": "근거 요약 모드",
-    "retrieval_only": "근거 요약 모드",
+    "lm_studio": "요약 생성",
+    "retrieval_fallback": "근거 중심 정리",
+    "retrieval_only": "근거 중심 정리",
     "quota_blocked": "질문 차단",
 }
 
@@ -67,7 +68,7 @@ def get_store():
 
 
 @st.cache_resource
-def get_answer_service(base_url: str):
+def get_answer_service(base_url: str, model_name: str):
     settings = get_settings()
     return AnswerService(
         settings,
@@ -75,16 +76,18 @@ def get_answer_service(base_url: str):
         client=LMStudioAnswerClient(
             settings,
             base_url=base_url,
+            model_name=model_name or None,
             enforce_limits=False,
         ),
     )
 
 
 @st.cache_data(ttl=3, show_spinner=False)
-def probe_lm_studio(base_url: str) -> dict[str, Any]:
+def probe_lm_studio(base_url: str, model_name: str) -> dict[str, Any]:
     client = LMStudioAnswerClient(
         get_settings(),
         base_url=base_url,
+        model_name=model_name or None,
         enforce_limits=False,
     )
     return client.describe_connection()
@@ -276,6 +279,7 @@ def ensure_session_state() -> None:
     st.session_state.setdefault("question_input", "")
     st.session_state.setdefault("clear_question_input", False)
     st.session_state.setdefault("local_base_url", DEFAULT_LM_STUDIO_BASE_URL)
+    st.session_state.setdefault("local_model_name", "")
     if st.session_state.clear_question_input:
         st.session_state.question_input = ""
         st.session_state.clear_question_input = False
@@ -333,7 +337,7 @@ def render_example_buttons() -> str | None:
     columns = st.columns(len(CHAT_EXAMPLES))
     for idx, question in enumerate(CHAT_EXAMPLES):
         label = ["현행 규정", "개정 이유", "실무 참고"][idx]
-        if columns[idx].button(label, key=f"local_example_{idx}", use_container_width=True):
+        if columns[idx].button(label, key=f"local_example_{idx}", width="stretch"):
             return question
     return None
 
@@ -356,7 +360,7 @@ def render_question_box() -> tuple[bool, str]:
             unsafe_allow_html=True,
         )
     with footer_right:
-        submitted = st.button("질문하기", type="primary", use_container_width=True)
+        submitted = st.button("질문하기", type="primary", width="stretch")
     return submitted, question
 
 
@@ -369,6 +373,22 @@ def render_connection_notice(connection_state: dict[str, Any]) -> None:
         st.warning(connection_state.get("message") or "LM Studio가 준비되지 않아 근거 요약 모드로 전환됩니다.")
 
 
+def trim_preview_text(text: str, preview_chars: int) -> str:
+    compact = " ".join((text or "").split()).strip()
+    if len(compact) <= preview_chars:
+        return compact
+
+    candidate = compact[:preview_chars]
+    boundary = max(candidate.rfind(". "), candidate.rfind("다. "), candidate.rfind("; "))
+    if boundary >= int(preview_chars * 0.55):
+        return candidate[: boundary + 1].rstrip()
+
+    last_space = candidate.rfind(" ")
+    if last_space >= int(preview_chars * 0.55):
+        candidate = candidate[:last_space]
+    return candidate.rstrip(" ,;:") + "..."
+
+
 def render_evidence_card(hit: SearchHit, preview_chars: int) -> None:
     chunk = hit.chunk
     article_ref = " ".join(part for part in [chunk.article_no, chunk.article_title] if part).strip()
@@ -379,8 +399,7 @@ def render_evidence_card(hit: SearchHit, preview_chars: int) -> None:
         meta.append(f"시행일 {chunk.effective_date}")
 
     text = str(chunk.extra.get("display_text") or chunk.extra.get("summary_text") or chunk.text).strip()
-    if len(text) > preview_chars:
-        text = text[:preview_chars].rstrip() + "..."
+    text = trim_preview_text(text, preview_chars)
 
     with st.container(border=True):
         st.markdown(f"**{chunk.law_name}**")
@@ -419,6 +438,101 @@ def export_filename(turn_index: int) -> str:
     return f"local_military_rule_chat_turn_{turn_index}_{timestamp}.docx"
 
 
+def _usage_value(snapshot: dict[str, Any] | None, key: str) -> int:
+    if not snapshot:
+        return 0
+    return int(snapshot.get(key, 0) or 0)
+
+
+def _answer_usage_delta(before: dict[str, Any] | None, after: dict[str, Any] | None) -> dict[str, int]:
+    keys = ("prompt_tokens", "candidate_tokens", "total_tokens")
+    return {
+        key: max(_usage_value(after, key) - _usage_value(before, key), 0)
+        for key in keys
+    }
+
+
+def format_answer_meta(answer: dict[str, Any]) -> str:
+    latency_ms = int(answer.get("answer_latency_ms", 0) or 0)
+    token_usage = answer.get("answer_token_usage") or {}
+    total_tokens = int(token_usage.get("total_tokens", 0) or 0)
+
+    parts: list[str] = []
+    if latency_ms > 0:
+        if latency_ms >= 1000:
+            parts.append(f"{latency_ms / 1000:.1f}초")
+        else:
+            parts.append(f"{latency_ms}ms")
+    if total_tokens > 0:
+        parts.append(f"{total_tokens} 토큰")
+    return " · ".join(parts)
+
+
+def format_diagnostic_summary(answer: dict[str, Any]) -> str:
+    diagnostics = answer.get("diagnostics") or {}
+    failure_type = str(diagnostics.get("failure_type", "") or "").strip()
+    backend = str(answer.get("answer_backend", "") or "").strip()
+    if backend == "lm_studio" and failure_type in {"", "ok"}:
+        return "요약 생성"
+    if backend in {"retrieval_fallback", "retrieval_only"}:
+        return "근거 중심 정리"
+    if failure_type and failure_type != "ok":
+        return "근거 기반 응답"
+    return ""
+
+
+def format_public_notice(answer: dict[str, Any]) -> str:
+    notice = str(answer.get("answer_notice", "") or "").strip()
+    if answer.get("answer_backend") == "quota_blocked":
+        return notice
+    return ""
+
+
+def render_debug_panel(answer: dict[str, Any]) -> None:
+    diagnostics = answer.get("diagnostics") or {}
+    validator = diagnostics.get("validator") or {}
+    retrieval_slots = diagnostics.get("retrieval_slots") or {}
+
+    st.caption("시연용 내부 정보입니다. 기본 답변과 DOCX에는 내부 상태명을 노출하지 않습니다.")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Backend", str(answer.get("answer_backend", "-")))
+    col2.metric("Intent", str(diagnostics.get("intent") or answer.get("intent") or "-"))
+    col3.metric("Internal", str(diagnostics.get("internal_status") or diagnostics.get("failure_type") or "-"))
+    col4.metric("HTTP", str(diagnostics.get("http_status") or "-"))
+
+    route_rationale = diagnostics.get("route_rationale") or answer.get("route_rationale")
+    if route_rationale:
+        st.markdown("**Route rationale**")
+        st.caption(str(route_rationale))
+
+    if validator:
+        st.markdown("**Validator**")
+        validator_rows = [
+            {"check": str(key), "result": str(value)}
+            for key, value in validator.items()
+            if key not in {"reasons", "unsupported_sentences"} and not isinstance(value, (dict, list))
+        ]
+        if validator_rows:
+            st.dataframe(validator_rows, hide_index=True, width="stretch")
+        if validator.get("reasons"):
+            st.caption("reasons: " + ", ".join(str(item) for item in validator.get("reasons", [])))
+
+    if retrieval_slots:
+        st.markdown("**Retrieval slots**")
+        for slot_name, labels in retrieval_slots.items():
+            if labels:
+                st.caption(f"{slot_name}: " + " / ".join(str(label) for label in labels[:5]))
+
+    with st.expander("Raw diagnostics JSON", expanded=False):
+        st.json(
+            {
+                "answer_backend": answer.get("answer_backend"),
+                "lm_studio_usage": answer.get("model_usage", {}),
+                "diagnostics": diagnostics,
+            }
+        )
+
+
 def render_chat_history(preview_chars: int, all_source_types: list[str]) -> None:
     history = st.session_state.chat_history
     turns = build_conversation_turns(history)
@@ -454,6 +568,9 @@ def render_chat_history(preview_chars: int, all_source_types: list[str]) -> None
             with top_left:
                 st.caption("실무 참고용, 법률자문 아님")
             with top_right:
+                answer_meta = format_answer_meta(turn.answer)
+                if answer_meta:
+                    st.caption(answer_meta)
                 docx_bytes = build_conversation_docx(flatten_turns(turns[:turn_index]))
                 st.download_button(
                     "DOCX 내보내기",
@@ -461,11 +578,15 @@ def render_chat_history(preview_chars: int, all_source_types: list[str]) -> None
                     file_name=export_filename(turn_index),
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     key=f"export_turn_{turn_index}",
-                    use_container_width=True,
+                        width="stretch",
                 )
 
-            if turn.answer.get("answer_notice"):
-                st.info(turn.answer["answer_notice"])
+            public_notice = format_public_notice(turn.answer)
+            if public_notice:
+                st.info(public_notice)
+            diagnostic_summary = format_diagnostic_summary(turn.answer)
+            if diagnostic_summary:
+                st.caption(diagnostic_summary)
             st.markdown(turn.answer.get("answer_markdown", ""))
 
             evidence = turn.answer.get("evidence") or []
@@ -477,17 +598,17 @@ def render_chat_history(preview_chars: int, all_source_types: list[str]) -> None
                     render_grouped_evidence(evidence, preview_chars)
 
             with st.expander("디버그 정보", expanded=False):
-                st.json(
-                    {
-                        "intent": turn.answer.get("intent"),
-                        "route_rationale": turn.answer.get("route_rationale"),
-                        "answer_backend": turn.answer.get("answer_backend"),
-                        "lm_studio_usage": turn.answer.get("model_usage", {}),
-                    }
-                )
+                render_debug_panel(turn.answer)
 
 
-def store_answer(result, law_name: str, source_types: list[str]) -> None:
+def store_answer(
+    result,
+    law_name: str,
+    source_types: list[str],
+    *,
+    answer_latency_ms: int = 0,
+    answer_token_usage: dict[str, int] | None = None,
+) -> None:
     st.session_state.chat_history.extend(
         [
             {
@@ -505,6 +626,9 @@ def store_answer(result, law_name: str, source_types: list[str]) -> None:
                 "answer_backend": result.answer_backend,
                 "answer_notice": result.answer_notice,
                 "model_usage": result.quota_snapshot,
+                "diagnostics": result.diagnostics,
+                "answer_latency_ms": int(answer_latency_ms or 0),
+                "answer_token_usage": dict(answer_token_usage or {}),
                 "law_name": law_name,
                 "source_types": list(source_types),
             },
@@ -524,14 +648,26 @@ def handle_question(
         st.error(error)
         return
 
+    before_usage = {}
+    if getattr(service, "client", None) is not None and getattr(service.client, "usage_tracker", None) is not None:
+        before_usage = service.client.usage_tracker.snapshot()
+    started_at = perf_counter()
     with st.spinner("근거 문서를 찾고 로컬 모델로 답변을 구성하고 있습니다..."):
         result = service.answer(
             question=question,
             law_name=law_name,
             source_types=source_types or None,
         )
+    elapsed_ms = int((perf_counter() - started_at) * 1000)
+    usage_delta = _answer_usage_delta(before_usage, result.quota_snapshot)
 
-    store_answer(result, law_name, source_types)
+    store_answer(
+        result,
+        law_name,
+        source_types,
+        answer_latency_ms=elapsed_ms,
+        answer_token_usage=usage_delta,
+    )
     st.session_state.clear_question_input = True
     st.rerun()
 
@@ -562,7 +698,7 @@ def render_bootstrap_panel(store: ChromaStore, rows: list[dict]) -> None:
 
     left_col, right_col = st.columns([1.1, 1.3])
     with left_col:
-        if st.button(button_label, use_container_width=True):
+        if st.button(button_label, width="stretch"):
             if corpus_path.exists():
                 with st.spinner(spinner_text):
                     ingest_jsonl(str(corpus_path), store)
@@ -587,15 +723,21 @@ def ensure_preferred_corpus_loaded(store: ChromaStore) -> bool:
     return store.count() > 0
 
 
-def render_sidebar(law_options: list[str], source_type_options: list[str]) -> tuple[str, str, list[str], dict[str, Any]]:
+def render_sidebar(law_options: list[str], source_type_options: list[str]) -> tuple[str, str, str, list[str], dict[str, Any]]:
     with st.sidebar:
         st.header("로컬 설정")
 
         default_base_url = st.session_state.get("local_base_url", DEFAULT_LM_STUDIO_BASE_URL)
         base_url = st.text_input("LM Studio Base URL", value=default_base_url)
         st.session_state.local_base_url = base_url.strip() or DEFAULT_LM_STUDIO_BASE_URL
+        default_model_name = st.session_state.get("local_model_name", "")
+        model_name = st.text_input("LM Studio Model Override", value=default_model_name, placeholder="예: gpt-oss-20b")
+        st.session_state.local_model_name = model_name.strip()
 
-        connection_state = probe_lm_studio(st.session_state.local_base_url)
+        connection_state = probe_lm_studio(
+            st.session_state.local_base_url,
+            st.session_state.local_model_name,
+        )
         if connection_state.get("available"):
             st.success(connection_state["message"])
         else:
@@ -606,6 +748,8 @@ def render_sidebar(law_options: list[str], source_type_options: list[str]) -> tu
             st.caption("현재 로드된 LLM: " + ", ".join(loaded_models))
         else:
             st.caption("LM Studio에서 LLM 하나만 로드하면 앱이 그 모델을 자동으로 따라갑니다.")
+        if st.session_state.local_model_name:
+            st.caption("현재 명시한 모델: " + st.session_state.local_model_name)
         st.caption("로컬 버전에서는 질문 횟수와 한도를 제한하지 않습니다.")
 
         st.divider()
@@ -620,12 +764,18 @@ def render_sidebar(law_options: list[str], source_type_options: list[str]) -> tu
         st.caption("자료 유형을 좁히면 현행 조문과 개정 자료를 더 분명하게 구분해서 볼 수 있습니다.")
 
         st.divider()
-        if st.button("대화 기록 초기화", use_container_width=True):
+        if st.button("대화 기록 초기화", width="stretch"):
             st.session_state.chat_history = []
             st.session_state.clear_question_input = True
             st.rerun()
 
-    return st.session_state.local_base_url, selected_law, selected_source_types, connection_state
+    return (
+        st.session_state.local_base_url,
+        st.session_state.local_model_name,
+        selected_law,
+        selected_source_types,
+        connection_state,
+    )
 
 
 def main() -> None:
@@ -643,11 +793,11 @@ def main() -> None:
     law_options = load_law_options(rows)
     source_type_options = load_source_type_options(rows)
 
-    base_url, selected_law, selected_source_types, connection_state = render_sidebar(
+    base_url, model_name, selected_law, selected_source_types, connection_state = render_sidebar(
         law_options,
         source_type_options,
     )
-    service = get_answer_service(base_url)
+    service = get_answer_service(base_url, model_name)
 
     if store.count() == 0:
         ensure_preferred_corpus_loaded(store)

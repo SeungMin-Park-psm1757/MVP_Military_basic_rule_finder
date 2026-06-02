@@ -12,6 +12,9 @@ military-service-regulation-initial,군인복무규율,초기 제정본,history_
 military-service-regulation-final,군인복무규율,말기 연혁본,history_note,https://www.law.go.kr/LSW/lsInfoP.do?chrClsCd=010102&lsId=003019&lsiSeq=172905&viewCls=lsPtnThdCmp,군인기본법 제정 직전 시기의 말기 버전 확인용.
 military-service-regulation-revision-docs,군인복무규율,제·개정문 목록,old_new_comparison,https://www.law.go.kr/LSW/lsRvsDocListP.do?lsId=003019,과거 개정문과 비교 자료로 이어지는 핵심 목록 페이지.
 military-service-regulation-reasons,군인복무규율,제·개정이유 목록,revision_reason,https://www.law.go.kr/LSW/lsRvsRsnListP.do?lsId=003019&chrClsCd=010202&lsRvsGubun=all,군인기본법 이전 복무규율 개정 취지와 연혁 설명 확보용 목록 페이지.
+military-personnel-act-current,군인사법,현행 본문,law_text,https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B5%B0%EC%9D%B8%EC%82%AC%EB%B2%95,징계 종류와 인사상 처분의 현행 법률 근거 확인용.
+military-discipline-decree-current,군인 징계령,현행 본문,law_text,https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B5%B0%EC%9D%B8%20%EC%A7%95%EA%B3%84%EB%A0%B9,징계 절차와 징계위원회 운영의 현행 대통령령 근거 확인용.
+military-discipline-rule-current,군인 징계령 시행규칙,현행 본문,law_text,https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B5%B0%EC%9D%B8%20%EC%A7%95%EA%B3%84%EB%A0%B9%20%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99,징계 양정기준과 서식 등 세부 절차의 현행 부령 근거 확인용.
 openapi-current-law-body-guide,국가법령정보 공동활용,현행법령(시행일) 본문 조회 API,api_guide,https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=lsEfYdInfoGuide,full ingest 시 law.go.kr 본문 수집용 공식 가이드.
 openapi-history-guide,국가법령정보 공동활용,법령 연혁 본문 조회 API,api_guide,https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=lsHstInfoGuide,연혁 버전 본문 수집용 공식 가이드.
 openapi-old-new-guide,국가법령정보 공동활용,신구법 본문 조회 API,api_guide,https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=oldAndNewInfoGuide,신구조문 비교문 수집용 공식 가이드.

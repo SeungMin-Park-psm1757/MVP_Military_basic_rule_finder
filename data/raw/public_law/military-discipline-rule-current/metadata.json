@@ -1,0 +1,14 @@
+{
+  "source_id": "military-discipline-rule-current",
+  "law_name": "군인 징계령 시행규칙",
+  "scope": "현행 본문",
+  "source_type": "law_text",
+  "source_url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B5%B0%EC%9D%B8%20%EC%A7%95%EA%B3%84%EB%A0%B9%20%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99",
+  "notes": "징계 양정기준과 서식 등 세부 절차의 현행 부령 근거 확인용.",
+  "retrieved_at": "2026-04-21T00:49:55.126290+00:00",
+  "artifacts": [
+    "page.html",
+    "body.pdf"
+  ],
+  "pdf_url": "https://www.law.go.kr/LSW/lsPdfPrint.do?ancYnChk=0&bylChaChk=N&efGubun=Y&efYd=20260128&joAllCheck=Y&joEfOutPutYn=on&lsiSeq=283099&mokChaChk=N"
+}

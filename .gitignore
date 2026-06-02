@@ -4,9 +4,12 @@ __pycache__/
 .env
 .streamlit/secrets.toml
 data/chroma/
+data/chroma_validation/
 data/runtime/
 data/raw/downloads/
 data/processed/*.jsonl
 !data/sample/processed/sample_documents.jsonl
+local_portable/
+local_portable.zip
 .DS_Store
 .pytest_cache/

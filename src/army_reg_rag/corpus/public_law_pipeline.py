@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -17,6 +17,7 @@ from pypdf import PdfReader
 
 from army_reg_rag.config import Settings
 from army_reg_rag.utils.io import ensure_dir, read_jsonl, write_jsonl
+from army_reg_rag.utils.text_cleanup import repair_common_text_artifacts
 
 SUPPORTED_CORPUS_SOURCE_TYPES = {
     "law_text",
@@ -162,6 +163,9 @@ def _extract_effective_date(html: str) -> str:
     match = re.search(r"var\s+efYd\s*=\s*'(\d{8})';", html)
     if match:
         return match.group(1)
+    match = re.search(r"(?:[?&]|&amp;)efYd=(\d{8})(?:&|&amp;|$)", html)
+    if match:
+        return match.group(1)
 
     title_match = HEADER_RE.search(_canonical_text(BeautifulSoup(html, "lxml").get_text(" ", strip=True)))
     if title_match:
@@ -174,6 +178,9 @@ def _extract_lsi_seq(html: str) -> str:
     if match:
         return match.group(1)
     match = re.search(r"lsPopViewAll2\('(\d+)'", html)
+    if match:
+        return match.group(1)
+    match = re.search(r"(?:[?&]|&amp;)lsiSeq=(\d+)(?:&|&amp;|$)", html)
     if match:
         return match.group(1)
     raise ValueError("unable to derive lsiSeq from landing page")
@@ -193,6 +200,24 @@ def _build_pdf_download_url(row: ManifestRow, landing_html: str) -> str:
         "mokChaChk": "N",
     }
     return f"https://www.law.go.kr/LSW/lsPdfPrint.do?{urlencode(params)}"
+
+
+def _build_revision_reason_download_url(row: ManifestRow) -> str:
+    parsed = urlparse(row.url)
+    query = parse_qs(parsed.query)
+    ls_id = (query.get("lsId") or [""])[0]
+    chr_cls_cd = (query.get("chrClsCd") or ["010202"])[0]
+    ls_rvs_gubun = (query.get("lsRvsGubun") or ["all"])[0]
+    if not ls_id:
+        raise ValueError(f"unable to derive lsId from revision_reason url: {row.url}")
+    params = {
+        "lsId": ls_id,
+        "chrClsCd": chr_cls_cd,
+        "save": "save",
+        "saveExt": "txt",
+        "lsRvsGubun": ls_rvs_gubun,
+    }
+    return f"https://www.law.go.kr/LSW/lsRvsRsnDocInfoR.do?{urlencode(params)}"
 
 
 def _download_single_source(
@@ -234,6 +259,16 @@ def _download_single_source(
         pdf_path.write_bytes(pdf_response.content)
         metadata["pdf_url"] = pdf_url
         metadata["artifacts"].append("body.pdf")
+    elif row.source_type == "revision_reason":
+        txt_url = _build_revision_reason_download_url(row)
+        txt_response = _request_with_retry(session, txt_url, referer=row.url)
+        text_body = txt_response.text.strip()
+        if row.law_name not in text_body:
+            raise RuntimeError(f"expected law name not found in revision_reason payload: {row.law_name}")
+        txt_path = source_dir / "body.txt"
+        txt_path.write_text(text_body, encoding="utf-8")
+        metadata["txt_url"] = txt_url
+        metadata["artifacts"].append("body.txt")
 
     metadata_path = source_dir / "metadata.json"
     metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -320,7 +355,7 @@ def _drop_standalone_lines(text: str, patterns: list[str]) -> str:
 
 def _normalize_wrapped_newlines(text: str) -> str:
     normalized = text.replace("\r\n", "\n").replace("\r", "\n")
-    normalized = re.sub(r"(?<=[가-힣A-Za-z0-9,·ㆍ])\n(?=[가-힣A-Za-z])", "", normalized)
+    normalized = re.sub(r"(?<=[가-힣A-Za-z0-9,·ㆍ])\n(?=[가-힣A-Za-z“”\"'])", "", normalized)
     normalized = re.sub(r"\n{3,}", "\n\n", normalized)
     return normalized
 
@@ -349,6 +384,7 @@ def _clean_text(text: str, *, law_name: str = "") -> str:
     cleaned = re.sub(r"\n\s+\n", "\n\n", cleaned)
     cleaned = re.sub(r"[ \t]+", " ", cleaned)
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    cleaned = repair_common_text_artifacts(cleaned)
     return cleaned.strip()
 
 
@@ -360,6 +396,10 @@ def _pdf_text(path: Path) -> str:
 def _html_text(path: Path) -> str:
     soup = BeautifulSoup(path.read_text(encoding="utf-8"), "lxml")
     return _clean_text(soup.get_text("\n", strip=True))
+
+
+def _plain_text(path: Path) -> str:
+    return _clean_text(path.read_text(encoding="utf-8"))
 
 
 def _strip_article_heading(text: str, article_no: str, article_title: str) -> str:
@@ -677,8 +717,8 @@ def _build_records_for_law_text(metadata: dict[str, Any], pdf_path: Path) -> lis
     return records
 
 
-def _build_records_for_revision_like(metadata: dict[str, Any], html_path: Path) -> list[dict[str, Any]]:
-    text = _html_text(html_path)
+def _build_records_for_revision_like(metadata: dict[str, Any], html_path: Path, text_path: Path | None = None) -> list[dict[str, Any]]:
+    text = _plain_text(text_path) if text_path and text_path.exists() else _html_text(html_path)
     sections = _split_revision_sections(text)
     article_title = "제정·개정이유" if metadata.get("source_type") == "revision_reason" else "제정·개정문"
     canonical_law_name = _collapse_repeated_phrase(str(metadata.get("law_name", "")))
@@ -746,11 +786,12 @@ def normalize_public_sources(
         source_dir = metadata_path.parent
         page_path = source_dir / "page.html"
         pdf_path = source_dir / "body.pdf"
+        text_path = source_dir / "body.txt"
 
         if source_type in {"law_text", "history_note"}:
             built_records = _build_records_for_law_text(metadata, pdf_path)
         else:
-            built_records = _build_records_for_revision_like(metadata, page_path)
+            built_records = _build_records_for_revision_like(metadata, page_path, text_path if source_type == "revision_reason" else None)
 
         records.extend(built_records)
         source_reports.append(

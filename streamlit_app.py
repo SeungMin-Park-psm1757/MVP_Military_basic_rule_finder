@@ -47,8 +47,9 @@ BACKEND_LABELS = {
     "chroma": "Chroma PersistentClient",
     "json_fallback": "JSON fallback store",
     "gemini": "Gemini 2.0 Flash",
-    "retrieval_fallback": "근거요약모드",
-    "retrieval_only": "근거요약모드",
+    "lm_studio": "요약 생성",
+    "retrieval_fallback": "근거 중심 정리",
+    "retrieval_only": "근거 중심 정리",
     "quota_blocked": "제한",
 }
 
@@ -455,9 +456,16 @@ def render_example_buttons() -> str | None:
     )
     cols = st.columns(len(CHAT_EXAMPLES))
     for idx, (label, question) in enumerate(CHAT_EXAMPLES):
-        if cols[idx].button(label, key=f"chat_example_{idx}", use_container_width=True):
+        if cols[idx].button(label, key=f"chat_example_{idx}", width="stretch"):
             return question
     return None
+
+
+def format_public_notice(message: dict) -> str:
+    notice = str(message.get("answer_notice", "") or "").strip()
+    if message.get("answer_backend") == "quota_blocked":
+        return notice
+    return ""
 
 
 def render_evidence_card(hit: SearchHit, preview_chars: int) -> None:
@@ -555,8 +563,9 @@ def render_chat_history(preview_chars: int, all_source_types: list[str], allow_d
         with st.chat_message("assistant"):
             st.caption("실무 참고용, 법률자문 아님")
             st.markdown(message["answer_markdown"])
-            if message.get("answer_notice"):
-                st.info(message["answer_notice"])
+            public_notice = format_public_notice(message)
+            if public_notice:
+                st.info(public_notice)
             if message.get("evidence"):
                 st.markdown("<div class='evidence-block-title'>근거(하단 원문 링크 참고)</div>", unsafe_allow_html=True)
                 if message.get("answer_backend"):
@@ -572,6 +581,7 @@ def render_chat_history(preview_chars: int, all_source_types: list[str], allow_d
                             "route_rationale": message["route_rationale"],
                             "answer_backend": message.get("answer_backend"),
                             "quota_snapshot": message.get("quota_snapshot", {}),
+                            "diagnostics": message.get("diagnostics", {}),
                         }
                     )
 
@@ -623,7 +633,7 @@ def render_sidebar(
         st.divider()
 
         st.header("세션")
-        if st.button("대화 초기화", use_container_width=True):
+        if st.button("대화 초기화", width="stretch"):
             st.session_state.chat_history = []
             st.session_state.clear_question_input = True
             st.rerun()
@@ -648,6 +658,7 @@ def _store_answer(result, law_name: str, source_types: list[str], *, replace_his
             "answer_backend": result.answer_backend,
             "answer_notice": result.answer_notice,
             "quota_snapshot": result.quota_snapshot,
+            "diagnostics": result.diagnostics,
             "law_name": law_name,
             "source_types": list(source_types),
         },
@@ -763,7 +774,7 @@ def render_bootstrap_panel(rows: list[dict]) -> None:
         caption_label = "샘플"
     col1, col2 = st.columns([1, 1.1])
     with col1:
-        if st.button(button_label, use_container_width=True):
+        if st.button(button_label, width="stretch"):
             if corpus_path.exists():
                 with st.spinner(spinner_text):
                     ingest_jsonl(str(corpus_path), get_store())
@@ -791,7 +802,7 @@ def render_question_box(max_chars: int) -> tuple[bool, str]:
             unsafe_allow_html=True,
         )
     with footer_col_2:
-        submitted = st.button("전송", key="send_question", type="primary", use_container_width=True)
+        submitted = st.button("전송", key="send_question", type="primary", width="stretch")
     return submitted, question
 
 

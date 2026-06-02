@@ -5,8 +5,10 @@ from pathlib import Path
 from army_reg_rag.config import AppConfig, DataConfig, Settings
 from army_reg_rag.corpus.public_law_pipeline import (
     _collapse_repeated_phrase,
+    _build_records_for_revision_like,
     _build_revision_display_text,
     _build_pdf_download_url,
+    _build_revision_reason_download_url,
     _clean_text,
     _parse_header,
     _split_revision_reason_chunks,
@@ -58,6 +60,38 @@ def test_build_pdf_download_url_uses_landing_page_state():
     assert "lsiSeq=268083" in url
     assert "efYd=20260108" in url
     assert "joAllCheck=Y" in url
+
+
+def test_build_pdf_download_url_uses_pretty_law_url_iframe_state():
+    landing_html = """
+    <html>
+      <body>
+        <iframe src="/LSW//lsInfoP.do?lsiSeq=283197&amp;chrClsCd=010202&amp;urlMode=lsInfoP&amp;efYd=20260203&amp;ancYnChk=0"></iframe>
+      </body>
+    </html>
+    """
+    row = type("Row", (), {"source_type": "law_text"})()
+
+    url = _build_pdf_download_url(row, landing_html)
+
+    assert "lsiSeq=283197" in url
+    assert "efYd=20260203" in url
+
+
+def test_build_revision_reason_download_url_uses_txt_export_endpoint():
+    row = type(
+        "Row",
+        (),
+        {
+            "url": "https://www.law.go.kr/LSW/lsRvsRsnListP.do?lsId=012591&chrClsCd=010102&lsRvsGubun=all",
+        },
+    )()
+
+    url = _build_revision_reason_download_url(row)
+
+    assert "lsRvsRsnDocInfoR.do" in url
+    assert "lsId=012591" in url
+    assert "saveExt=txt" in url
 
 
 def test_split_article_segments_extracts_articles_and_supplementary():
@@ -123,6 +157,21 @@ def test_clean_text_joins_wrapped_words_and_drops_standalone_headers():
     assert "제6장 보칙" not in cleaned
 
 
+def test_clean_text_repairs_common_pdf_spacing_artifacts():
+    cleaned = _clean_text(
+        "제44조 신고등\n"
+        "”이라 한다. 그가신고자임을 알 수있다.\n"
+        "제12조 청원휴 가는 왕복소일수 관련 사항를 정한다."
+    )
+
+    assert "신고등”이라 한다" in cleaned
+    assert "그가 신고자임" in cleaned
+    assert "수 있다" in cleaned
+    assert "청원휴가" in cleaned
+    assert "왕복소요일수" in cleaned
+    assert "사항을" in cleaned
+
+
 def test_strip_article_heading_and_revision_heading_produce_clean_summaries():
     article_text = "제45조(신고자 보호) 누구든지 신고를 이유로 불이익조치를 하여서는 아니 된다."
     revision_text = (
@@ -152,3 +201,32 @@ def test_strip_article_heading_and_revision_heading_produce_clean_summaries():
         ("주요내용 가", "가. 신고자 보호 조문을 정비함."),
         ("주요내용 나", "나. 불이익조치를 금지함."),
     ]
+
+
+def test_build_records_for_revision_like_prefers_plain_text_payload(tmp_path):
+    source_dir = tmp_path / "revision"
+    source_dir.mkdir()
+    html_path = source_dir / "page.html"
+    text_path = source_dir / "body.txt"
+    html_path.write_text("<html><body>목록 프레임</body></html>", encoding="utf-8")
+    text_path.write_text(
+        "군인의 지위 및 복무에 관한 기본법 시행령 [시행 2024. 8. 7.] [대통령령 제34971호, 2024. 8. 6., 일부개정]\n"
+        "◇ 개정이유\n"
+        "자녀돌봄휴가와 배우자 출산휴가 기준을 보완하려는 것임.\n"
+        "◇ 주요내용\n"
+        "가. 자녀돌봄휴가 사용 사유를 명확히 함.\n",
+        encoding="utf-8",
+    )
+    metadata = {
+        "source_id": "childcare-reason",
+        "law_name": "군인의 지위 및 복무에 관한 기본법 시행령",
+        "scope": "시행령 개정이유",
+        "source_type": "revision_reason",
+        "source_url": "https://example.com",
+    }
+
+    records = _build_records_for_revision_like(metadata, html_path, text_path)
+    combined = " ".join(record["text"] for record in records)
+
+    assert records
+    assert "자녀돌봄휴가" in combined

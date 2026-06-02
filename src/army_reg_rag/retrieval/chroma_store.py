@@ -14,6 +14,7 @@ _chromadb_module = None
 _chromadb_import_attempted = False
 _sentence_transformer_cls = None
 _sentence_transformer_import_attempted = False
+_loaded_sentence_transformer_models: dict[str, object | None] = {}
 
 
 def _get_chromadb():
@@ -55,13 +56,18 @@ class HybridTextEmbedder:
         if self._model is not None or self._model_load_attempted:
             return self._model
         self._model_load_attempted = True
+        if self.model_name in _loaded_sentence_transformer_models:
+            self._model = _loaded_sentence_transformer_models[self.model_name]
+            return self._model
         sentence_transformer_cls = _get_sentence_transformer_class()
         if sentence_transformer_cls is None:
+            _loaded_sentence_transformer_models[self.model_name] = None
             return None
         try:
             self._model = sentence_transformer_cls(self.model_name)
         except Exception:
             self._model = None
+        _loaded_sentence_transformer_models[self.model_name] = self._model
         return self._model
 
     def _tokenize(self, text: str) -> list[str]:
@@ -153,6 +159,19 @@ class _JsonFallbackStore:
             "documents": [[row[2] for row in rows]],
             "metadatas": [[row[3] for row in rows]],
             "distances": [[1.0 - float(row[0]) for row in rows]],
+        }
+
+    def get(self, where: dict | None = None) -> dict:
+        rows = []
+        for doc_id, payload in self.records.items():
+            metadata = payload.get("metadata", {})
+            if not self._matches_where(metadata, where):
+                continue
+            rows.append((doc_id, payload.get("document", ""), metadata))
+        return {
+            "ids": [row[0] for row in rows],
+            "documents": [row[1] for row in rows],
+            "metadatas": [row[2] for row in rows],
         }
 
     def reset(self) -> None:
@@ -250,28 +269,80 @@ class ChromaStore:
                 where=query_where,
             )
 
-        hits: list[SearchHit] = []
         ids = result.get("ids", [[]])[0]
         docs = result.get("documents", [[]])[0]
         metadatas = result.get("metadatas", [[]])[0]
         distances = result.get("distances", [[]])[0]
-        for doc_id, document, metadata, distance in zip(ids, docs, metadatas, distances):
-            record = {
-                "id": doc_id,
-                "text": document,
-                "law_name": metadata.get("law_name", ""),
-                "law_level": metadata.get("law_level", ""),
-                "source_type": metadata.get("source_type", ""),
-                "version_label": metadata.get("version_label", ""),
-                "promulgation_date": metadata.get("promulgation_date", ""),
-                "effective_date": metadata.get("effective_date", ""),
-                "article_no": metadata.get("article_no", ""),
-                "article_title": metadata.get("article_title", ""),
-                "revision_kind": metadata.get("revision_kind", ""),
-                "source_url": metadata.get("source_url", ""),
-            }
-            extra = {k: v for k, v in metadata.items() if k not in record}
-            record.update(extra)
-            score = 1.0 / (1.0 + float(distance or 0.0))
-            hits.append(SearchHit(chunk=DocumentChunk.from_record(record), score=score))
-        return hits
+        return [self._hit_from_row(doc_id, document, metadata, 1.0 / (1.0 + float(distance or 0.0))) for doc_id, document, metadata, distance in zip(ids, docs, metadatas, distances)]
+
+    def lexical_query(
+        self,
+        query_terms: list[str],
+        *,
+        top_k: int,
+        law_name: str | None = None,
+        source_type: str | None = None,
+    ) -> list[SearchHit]:
+        terms = [term.strip() for term in query_terms if term and term.strip()]
+        if not terms:
+            return []
+
+        where = {}
+        if law_name and law_name != "전체":
+            where["law_name"] = law_name
+        if source_type:
+            where["source_type"] = source_type
+
+        query_where = where if where else None
+        if law_name and law_name != "전체" and source_type:
+            query_where = {"$and": [{"law_name": law_name}, {"source_type": source_type}]}
+
+        if self._backend == "chroma":
+            result = self.collection.get(where=query_where, include=["documents", "metadatas"])
+            ids = result.get("ids", [])
+            docs = result.get("documents", [])
+            metadatas = result.get("metadatas", [])
+        else:
+            result = self.collection.get(where=query_where)
+            ids = result.get("ids", [])
+            docs = result.get("documents", [])
+            metadatas = result.get("metadatas", [])
+
+        hits: list[SearchHit] = []
+        lowered_terms = [term.lower() for term in terms]
+        for doc_id, document, metadata in zip(ids, docs, metadatas):
+            haystack = " ".join(
+                str(part or "")
+                for part in [
+                    metadata.get("law_name", ""),
+                    metadata.get("article_no", ""),
+                    metadata.get("article_title", ""),
+                    document,
+                ]
+            ).lower()
+            match_score = sum(haystack.count(term) * max(len(term), 1) for term in lowered_terms if term in haystack)
+            if match_score <= 0:
+                continue
+            hits.append(self._hit_from_row(doc_id, document, metadata, float(match_score)))
+
+        hits.sort(key=lambda item: (-item.score, item.chunk.id))
+        return hits[:top_k]
+
+    def _hit_from_row(self, doc_id: str, document: str, metadata: dict, score: float) -> SearchHit:
+        record = {
+            "id": doc_id,
+            "text": document,
+            "law_name": metadata.get("law_name", ""),
+            "law_level": metadata.get("law_level", ""),
+            "source_type": metadata.get("source_type", ""),
+            "version_label": metadata.get("version_label", ""),
+            "promulgation_date": metadata.get("promulgation_date", ""),
+            "effective_date": metadata.get("effective_date", ""),
+            "article_no": metadata.get("article_no", ""),
+            "article_title": metadata.get("article_title", ""),
+            "revision_kind": metadata.get("revision_kind", ""),
+            "source_url": metadata.get("source_url", ""),
+        }
+        extra = {k: v for k, v in metadata.items() if k not in record}
+        record.update(extra)
+        return SearchHit(chunk=DocumentChunk.from_record(record), score=score)
