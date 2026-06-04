@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -28,6 +29,13 @@ def ensure_demo_corpus() -> None:
     sample_path = Path("data/sample/processed/sample_documents.jsonl")
     if has_bootstrapped_chroma():
         print("Chroma bootstrap files already exist.", flush=True)
+        return
+    if os.getenv("RENDER_BOOTSTRAP_CHROMA", "").strip().lower() not in {"1", "true", "yes"}:
+        print(
+            "Chroma bootstrap files are missing; skipping runtime bootstrap so the web server can start.",
+            file=sys.stderr,
+            flush=True,
+        )
         return
 
     from dotenv import load_dotenv
@@ -63,29 +71,26 @@ def main() -> None:
         print(f"Render bootstrap warning: {exc}", file=sys.stderr, flush=True)
 
     port = os.getenv("PORT", "8501")
-    os.execvpe(
+    command = [
         sys.executable,
-        [
-            sys.executable,
-            "-m",
-            "streamlit",
-            "run",
-            "streamlit_app.py",
-            "--server.address",
-            "0.0.0.0",
-            "--server.port",
-            port,
-            "--server.headless",
-            "true",
-            "--server.enableCORS",
-            "false",
-            "--server.enableXsrfProtection",
-            "false",
-            "--server.enableWebsocketCompression",
-            "false",
-        ],
-        os.environ,
-    )
+        "-m",
+        "streamlit",
+        "run",
+        "streamlit_app.py",
+        "--server.address",
+        "0.0.0.0",
+        "--server.port",
+        port,
+        "--server.headless",
+        "true",
+        "--server.enableCORS",
+        "false",
+        "--server.enableXsrfProtection",
+        "false",
+        "--server.enableWebsocketCompression",
+        "false",
+    ]
+    sys.exit(subprocess.call(command, env=os.environ))
 
 
 if __name__ == "__main__":
