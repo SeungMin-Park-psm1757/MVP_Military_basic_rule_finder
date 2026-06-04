@@ -738,12 +738,12 @@ def handle_example_click(
     law_name: str,
     source_types: list[str],
 ) -> None:
-    result = service.answer(
-        question=question,
-        law_name=law_name,
-        source_types=source_types,
-        allow_generation=False,
-    )
+    with st.spinner("예시 질문의 근거 문서를 찾고 답변을 정리하고 있습니다..."):
+        result = service.answer(
+            question=question,
+            law_name=law_name,
+            source_types=source_types,
+        )
     _store_answer(result, law_name, source_types, replace_history=True)
     st.session_state.clear_question_input = True
     st.rerun()
